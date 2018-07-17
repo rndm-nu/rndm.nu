@@ -705,7 +705,7 @@ module main =
             let conf = 
                 let port =
                     match argv with
-                    | [||] -> 8080
+                    | [||] -> 80
                     | a -> int a.[0]
                 { 
                     defaultConfig with 
