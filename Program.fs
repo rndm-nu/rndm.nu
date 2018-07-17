@@ -64,6 +64,8 @@ type LocalThreadBuffer =
     private new () = {}
     [<ThreadStatic>] [<DefaultValue>] static val mutable private localThreadBuffer:LocalThreadBuffer
 
+module Utils =
+    let trace = ignore
 
 module Random =
     let getRandomBytes =
@@ -76,18 +78,18 @@ module Random =
             async {
                 let rnd = new System.Security.Cryptography.RNGCryptoServiceProvider()
                 while (true) do
-                    printfn "refill byte queue waiting"
+                    sprintf "refill byte queue waiting" |> Utils.trace
                     let! _ = mb.Receive()
-                    printfn "refill byte queue involked"
+                    sprintf "refill byte queue involked" |> Utils.trace
                     do! Async.Sleep 2
                     while (byteQueue.Count < 160) do
                         let byteArray = Array.zeroCreate (256 * 1024)
                         rnd.GetBytes byteArray
                         byteQueue.Enqueue byteArray
-                        printfn "Byte queue count: %i %i" byteQueue.Count System.Threading.Thread.CurrentThread.ManagedThreadId
+                        sprintf "Byte queue count: %i %i" byteQueue.Count System.Threading.Thread.CurrentThread.ManagedThreadId |> Utils.trace
                     rnd.Dispose()
                     
-                    printfn "refill byte queue done"
+                    sprintf "refill byte queue done" |> Utils.trace
             }
         )
 
@@ -103,7 +105,7 @@ module Random =
             }
         
         let tempArray = new ThreadLocal<_>(fun () -> 
-            printfn "New tempArray, threadId: %i" System.Threading.Thread.CurrentThread.ManagedThreadId
+            sprintf "New tempArray, threadId: %i" System.Threading.Thread.CurrentThread.ManagedThreadId |> Utils.trace
             ref (dequeueByteArray() |> Async.RunSynchronously)
         )
         let tempArrayIndex = new ThreadLocal<_>(fun () -> ref 0)
@@ -210,7 +212,7 @@ module ParameterParse =
         parseInt [] (str.ToCharArray() |> Array.toList)
     
     let tryParseParams (request : HttpRequest) (ctx : HttpContext) =
-        printfn "request.path request.host: %s %s" request.path (string ctx.clientIpTrustProxy)
+        sprintf "request.path request.host: %s %s" request.path (string ctx.clientIpTrustProxy) |> Utils.trace
         let path = request.path.Substring(1)
         let (|Prefix|_|) (p:string) (s:string) =
             if s.StartsWith(p) then
@@ -654,18 +656,18 @@ module ViewModel =
                
         
         let write' (conn, _) = socket {
-            printfn "write start"
+            sprintf "write start" |> Utils.trace
             let sw = Stopwatch()
             sw.Start()
             let rec transferBytes (conn : Connection) (bytesToSend : byte [] Async IEnumerator) = socket {
                 match bytesToSend.MoveNext() with
                 | false -> 
                     sw.Stop()
-                    printfn "sw: %i" sw.ElapsedMilliseconds
+                    sprintf "sw: %i" sw.ElapsedMilliseconds |> Utils.trace
                     return conn 
                 | true ->
                     let! bytes = bytesToSend.Current |> SocketOp.ofAsync
-                    printfn "writeChunk %s" (bytes |> Text.UTF8Encoding.UTF8.GetChars |> String)
+                    sprintf "writeChunk %s" (bytes |> Text.UTF8Encoding.UTF8.GetChars |> String) |> Utils.trace
                     let! _, conn = HttpOutput.writeChunk bytes conn
                     return! transferBytes conn bytesToSend 
             }
@@ -675,7 +677,7 @@ module ViewModel =
             let! conn = transferBytes conn (byteToSend.GetEnumerator())
             //let! _, conn = HttpOutput.writeChunk [|22uy|] conn
             let! _, conn = HttpOutput.writeChunk [||] conn
-            printfn "write end"
+            sprintf "write end" |> Utils.trace
             return conn
         }
 
