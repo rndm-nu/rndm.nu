@@ -209,8 +209,8 @@ module ParameterParse =
             | [] -> charAccListToResult charAcc chars
         parseInt [] (str.ToCharArray() |> Array.toList)
     
-    let tryParseParams (request : HttpRequest) =
-        printfn "request.path request.host: %s %s" request.path request.host
+    let tryParseParams (request : HttpRequest) (ctx : HttpContext) =
+        printfn "request.path request.host: %s %s" request.path (string ctx.clientIpTrustProxy)
         let path = request.path.Substring(1)
         let (|Prefix|_|) (p:string) (s:string) =
             if s.StartsWith(p) then
@@ -387,8 +387,9 @@ module ParameterParse =
             | _ -> Error ("Could not parse the mode", "shuffle26")
         | Failure (m,t) -> Error (m,t)
         |> function
-            | Ok params' -> (params', request.host |> IPAddress.Parse) |> Ok
+            | Ok params' -> (params', ctx.clientIpTrustProxy) |> Ok
             | Error (m,t) -> Error (m,t)
+        |> fun o -> (o, ctx)
         
 
 module Qouta =
@@ -433,6 +434,8 @@ module Qouta =
     let subtractRawBinaryRemaining i q =    {q with rawBinaryQoutaRemaining = Math.Max(q.rawBinaryQoutaRemaining - i, 0)}
     
 module ViewModel =
+    open System.Net
+
     type ResponseType =
     | Binary of byte [] Async list
     | SingleNum of string * uint64 Async * Format * Language
@@ -455,9 +458,9 @@ module ViewModel =
 
 
     
-    let paramsToViewModel (params') =
+    let paramsToViewModel (params', ctx : HttpContext) =
         match params' with
-        | Ok (params', ip) ->
+        | Ok (params', ip : IPAddress) ->
             let qoutaInfo = Qouta.getQoutaData ip
             Qouta.updateQoutaData (Qouta.subtractRequestsRemaining 1) ip
             match params' with
@@ -498,6 +501,7 @@ module ViewModel =
                 friendlyName = "Parse error"
                 description = sprintf "%s\n\ntry:\nrndm.nu/%s" message urlAdvice
             } |> Error
+        |> fun o -> o, ctx
 
 
  module Render =
@@ -552,12 +556,11 @@ module ViewModel =
 
 
     
-    let viewModelToResponse (params' : Result<(ViewModel.ResponseType * Qouta.QuotaInfo), ViewModel.Error>) (ctx : HttpContext)  =
+    let viewModelToResponse (params' : Result<(ViewModel.ResponseType * Qouta.QuotaInfo), ViewModel.Error>, ctx : HttpContext)  =
         let jsonMime = "application/json"
         let binMime = "application/octet-stream"
         let htmlMime = "text/html"
         let txtMime = "text/plain"
-
 
         
         let byteToSend, mime, httpCode, qoutaHeaders =
@@ -694,12 +697,13 @@ module main =
     [<EntryPoint>]
     let main argv =
         do //Start the http server
-            //let tt = tryParseParams >> ViewModel.paramsToViewModel >> Render.viewModelToResponse
+            //ViewModel.paramsToViewModel 
+            //let tt = (fun a b -> ParameterParse.tryParseParams a b |> ViewModel.paramsToViewModel |> Render.viewModelToResponse) // >> Render.viewModelToResponse
     
             let app =
                 choose [
                     Suave.Filters.GET >=> path "/" >=> Files.file (Path.Combine("pages", "en", "index.html"))
-                    request (ParameterParse.tryParseParams >> ViewModel.paramsToViewModel >> Render.viewModelToResponse)
+                    request (fun request context -> ParameterParse.tryParseParams request context |> ViewModel.paramsToViewModel |> Render.viewModelToResponse)
                 ]
             
             let conf = 
