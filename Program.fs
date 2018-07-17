@@ -698,7 +698,7 @@ module main =
     
             let app =
                 choose [
-                    Suave.Filters.GET >=> path "" >=> Files.file (Path.Combine("pages", "en", "index.html"))
+                    Suave.Filters.GET >=> path "/" >=> Files.file (Path.Combine("pages", "en", "index.html"))
                     request (ParameterParse.tryParseParams >> ViewModel.paramsToViewModel >> Render.viewModelToResponse)
                 ]
             
