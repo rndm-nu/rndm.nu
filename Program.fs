@@ -410,7 +410,7 @@ module Qouta =
     }
     
     let defaultQoutaInfo() = {
-        numberQoutaRemaining = 100000
+        numberQoutaRemaining = 10000000
         requestQoutaRemaining = 100000
         rawBinaryQoutaRemaining = 1000000
         quoateResetDate = DateTime.Now + TimeSpan.FromDays(1.0)
