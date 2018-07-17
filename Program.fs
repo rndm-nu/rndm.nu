@@ -210,7 +210,7 @@ module ParameterParse =
         parseInt [] (str.ToCharArray() |> Array.toList)
     
     let tryParseParams (request : HttpRequest) =
-        printfn "request.path: %s" request.path
+        printfn "request.path request.host: %s %s" request.path request.host
         let path = request.path.Substring(1)
         let (|Prefix|_|) (p:string) (s:string) =
             if s.StartsWith(p) then
