@@ -708,7 +708,7 @@ module main =
                     | a -> int a.[0]
                 { 
                     defaultConfig with 
-                        bindings = [ HttpBinding.createSimple HTTP (Net.IPAddress.Loopback.ToString()) port ]
+                        bindings = [ HttpBinding.createSimple HTTP (Net.IPAddress.Any.ToString()) port ]
                 }
             
             startWebServer conf app
