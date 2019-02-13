@@ -501,7 +501,7 @@ module ViewModel =
                 errorCode = 0
                 languageCode = "en"
                 friendlyName = "Parse error"
-                description = sprintf "%s\n\ntry:\nrndm.nu/%s" message urlAdvice
+                description = sprintf "%s\n\ntry: rndm.nu/%s" message urlAdvice
             } |> Error
         |> fun o -> o, ctx
 
@@ -705,6 +705,7 @@ module main =
             let app =
                 choose [
                     Suave.Filters.GET >=> path "/" >=> Files.file (Path.Combine("pages", "en", "index.html"))
+                    //Suave.Filters.GET >=> Files.file (Path.Combine("pages", "en", "api.html"))
                     request (fun request context -> ParameterParse.tryParseParams request context |> ViewModel.paramsToViewModel |> Render.viewModelToResponse)
                 ]
             

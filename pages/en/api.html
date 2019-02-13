@@ -15,8 +15,8 @@
           color:;
       }
       section {margin-top: 86px;margin-bottom: 86px;}
-      h1 { margin-top: 3em;} 
-      h2 { margin-top: 3em;} 
+      h1 { margin-top: 5em;} 
+      h2 { margin-top: 5em;} 
       h3 { margin-top: 3em;} 
       #editButton {margin-top: 3em;/* margin-bottom: 3em; */} 
       #footer {margin-top: 2em;} 
@@ -75,6 +75,9 @@
       <h1>API</h1>
       <p class="urlExample">rndm.nu/{<b>language</b>/}{<b>mode</b>}[<b>mode
           options</b>]{.<b>format</b>}</p>
+        <p class="urlExample">eg: <a href="/binary1024">rndm.nu/<b>6</b></a></p>
+        <p class="urlExample">eg: <a href="/binary1024">rndm.nu/<b>en/shuffle48.json</b></a></p>
+        <p class="urlExample">eg: <a href="/binary1024">rndm.nu/<b>fr/4-44x12.bin</b></a></p>
       <p>rndm.nu provides a simple URL based API to retrieve true random
         numbers in all sorts of formats. The API is easy to use for both
         humans and programs alike. Above is the basic format which every
@@ -85,8 +88,9 @@
         examples for each use case. </p>
       <div>
         <p class="smallHeading">Language</p>
-        <p class="urlExample">{<b>language</b>/} where <b>language </b>must
-          be either '<b>en</b>', '<b>es</b>', '<b>ja</b>' or '<b>ch</b>'</p>
+        <p class="urlExample"><b>language </b>must be either '<b>en</b>', '<b>es</b>', '<b>ja</b>' or '<b>ch</b>'</p>
+        <p class="urlExample">default value is '<b>en</b>'</p>
+        <p class="urlExample">eg: <a href="/en/6">rndm.nu/<b>en/</b>6</a></p>
         <p>Represents the ISO 639-1 language code of the language you
           prefer HTML responses and error messages to use. If not
           provided the the language will be chosen from the <b>Accept-Language</b>
@@ -95,9 +99,11 @@
       </div>
       <div>
         <p class="smallHeading">Mode</p>
-        <p class="urlExample">[<b>mode</b>] where <b>mode </b>must be
-          either '<b>standard</b>', '<b>binary</b>', '<b>shuffle</b>' or
-          '<b>lottery</b>'</p>
+        <p class="urlExample"><b>mode</b> must be either '<b>standard</b>', '<b>binary</b>', '<b>shuffle</b>' or '<b>lottery</b>'</p>
+        <p class="urlExample">default value is '<b>standard</b>'</p>
+        <p class="urlExample">eg: <a href="/binary1024">rndm.nu/<b>binary</b>1024</a></p>
+
+
         <p>The <b>mode</b> parameter determines what kind of random
           numbers you want in your response. If <b>mode </b>is not
           provided it will default to '<b>standard</b>'. Each <b>mode </b>and
@@ -106,8 +112,10 @@
       </div>
       <div>
         <p class="smallHeading">Format</p>
-        <p class="urlExample">{.<b>format</b>} where <b>format </b>is
+        <p class="urlExample"><b>format</b> must be
           either '<b>html</b>', '<b>txt</b>', '<b>json</b>' or '<b>bin</b>'</p>
+        <p class="urlExample">default value is '<b>html</b>'</p>
+        <p class="urlExample">eg: <a href="/binary1024">rndm.nu/6<b>.json</b></a></p>
         <p>Represents the format you want the numbers returned in.
           Defaults to <b>html</b>. If format is not provided in the URL
           it can be set by specifying the corresponding MIME type in the
@@ -123,207 +131,92 @@
           format.</p>
       </div>
       <div>
-        <h2>Modes</h2>
+        <h2>Mode and Mode Options</h2>
         <p>The rndm.nu API offers four different modes with which to
           retrive random numbers of multiple kinds. They are described
           as follows:</p>
         <div>
           <h3>Standard mode</h3>
-          <p class="urlExample">/[<b>range</b>]{x<b>multiplier</b>}{.<b>format</b>}</p>
-          <p>Standard mode returns well formatted random numbers with
-            many formatting options.</p>
-          <div class="example">
-            <p>eg:</p>
-            <p><a href="/10">rndm.nu/10</a> (a random number between 1
-              and 10 in html format)</p>
-            <p><a href="/5x100.txt">rndm.nu/5x100.txt</a> (100 random
-              numbers between 1 and 5 in text format)</p>
-            <p><a href="/5x100.txt">rndm.nu/3-4.bin</a> (a random number
-              between 3 and 5 in binary format)</p>
-            <p><a href="/500-600x1000.json">rndm.nu/500-600x1000.json</a>
-              (1000 random numbers between 500 and 600 in json format)</p>
-          </div>
+          <p class="urlExample">[<b>range</b>]{x<b>multiplier</b>}</p>
+        <p class="urlExample">eg: <a href="/binary1024">rndm.nu/<b>6</b></a></p>
+        <p class="urlExample">eg: <a href="/binary1024">rndm.nu/fr/<b>10-20</b>.json</a></p>
+        <p class="urlExample">eg: <a href="/binary1024">rndm.nu/jp/<b>0-1x100</b>.txt</a></p>
+          <p>Standard mode returns one or many random numbers of a specified range.</p>
           <div>
             <p class="smallHeading">Range</p>
-            <p class="urlExample">[<b>range</b>] where <b>range</b><b>
-              </b>&gt; 1 or [<b>range</b><b>1</b>-<b>range</b><b>2</b>]
-              where <b>range</b><b>2 </b>&gt;<b> range</b><b>1 </b>and
-              <b>range</b><b>1</b> &gt;= 0</p>
+            <p class="urlExample">can be [<b>range</b>] where <b>range</b> must be greater than 1</p>
+            <p class="urlExample">or</p>
+            <p class="urlExample">can be [<b>startRange</b>-<b>endRange</b>] where <b>startRange</b> must be greater than <b>endRange</b> and
+              <b>startRange</b> must be greater than 0</p>
+            <p class="urlExample">eg: <a href="/binary1024">rndm.nu/<b>6</b></a></p>
+            <p class="urlExample">eg: <a href="/binary1024">rndm.nu/jp/<b>12-24</b>.txt</a></p>
+              
             <p>Represents the integer range a random number will be
-              picked from.</p>
-            <div class="example">
-              <p>eg:</p>
-              <p>5 (number between 1 and 5)</p>
-              <p>6-8 (number between 6 and 8)</p>
-            </div>
+              picked from. <a href="/6">rndm.nu/<b>6</b></a> is equivilant to <a href="/6">rndm.nu/<b>1-6</b></a></p>
           </div>
           <div>
             <p class="smallHeading">Multiplier</p>
-            <p class="urlExample">{x<b>multiplier</b>} where <b>multiplier
-              </b>&gt; 0</p>
+            <p class="urlExample"><b>multiplier</b> must be greater than 0</p>
+            <p class="urlExample">eg: <a href="/binary1024">rndm.nu/12-24<b>x100</b></a></p>
             <p>Represents how many individual random numbers you want
-              returned.</p>
-            <div class="example">
-              <p>eg:</p>
-              <p>x10 (10 random numbers)</p>
-            </div>
+              returned. if no <b>multiplier</b> parameter is set, a single number will be returned</p>
           </div>
         </div>
         <div>
           <h3>Binary mode</h3>
-          <p class="urlExample">/binary[<b>amount</b>]</p>
-          <p>Returns a stream of pure unbiased random bytes. Binary mode
-            will only return a <b>bin </b>format response. <b>html</b>,
-            <b>txt </b>and <b>json </b>formats are not supported in
+          <p class="urlExample">binary[<b>amount</b>]</p>
+          <p class="urlExample">eg: <a href="/binary1024">rndm.nu/<b>binary2048</b></a></p>
+          <p>Returns a stream of pure unbiased random bytes. Binary mode  will only return a <b>bin</b> format response. <b>html</b>, <b>txt</b> and <b>json</b> formats are not supported in
             Binary mode.</p>
-          <div class="example">
-            <p>eg:</p>
-            <p><a href="/binary50">rndm.nu/binary50</a> (returns 50
-              random bytes)</p>
-            <p><a href="/binary1024">rndm.nu/binary1024</a> (returns 1kb
-              of random bytes)</p>
-          </div>
           <p class="smallHeading">Amount</p>
-          <p class="urlExample">[<b>amount</b>] where <b>amount </b>&gt;
-            0</p>
+          <p class="urlExample"><b>amount </b>must be greater than 0</p>
+          <p class="urlExample">eg: <a href="/binary1024">rndm.nu/binary<b>128</b></a></p>
           <p>Specifies the number of bytes you wish to be returned.</p>
         </div>
         <div>
           <h3>Shuffle mode </h3>
-          <p class="urlExample">/shuffle[<b>length</b>]</p>
-          <p>Shuffles a consecutive set of integers.</p>
-          <div class="example">
-            <p>eg:</p>
-            <p><a href="/shuffle100">rndm.nu/shuffle100</a> (a shuffled
-              list of numbers from 1 to 100 in <b>html </b>format)</p>
-            <p><a href="/shuffle1024.json">rndm.nu/shuffle1024.json</a>
-              (a shuffled list of numbers from 1 to 1024 in <b>json </b>format)<br>
-            </p>
-          </div>
+          <p class="urlExample">shuffle[<b>length</b>]</p>
+            <p class="urlExample">eg: <a href="/shuffle40">rndm.nu/<b>shuffle40</b></a></p>
+          <p>Shuffles a set of consecutive integers.</p>
           <p class="smallHeading">Length</p>
-          <p><font size="-1">[<b>length</b>] where <b>length </b>&gt;
-              1</font></p>
+          <p class="urlExample"><b>length</b> must be grerater than 1</p>
+            <p class="urlExample">eg: <a href="/shuffle40">rndm.nu/shuffle<b>96</b></a></p>
           <p>Specifies the the length of the shuffled number list.</p>
         </div>
         <div>
           <h3>Lottery mode</h3>
-          <p class="urlExample">/lottery[<b>range</b>][-<b>amount</b>]{.<b>format</b>}</p>
+          <p class="urlExample">lottery[<b>range</b>]-[<b>amount</b>]</p>
+            <p class="urlExample">eg: <a href="/shuffle40">rndm.nu/<b>lottery48-7</b></a></p>
           <p>Randomly picks a specified amount of distinct integers from
             a range of integers.</p>
-          <div class="example">
-            <p>eg:</p>
-            <p><a href="/lottory48x6">rndm.nu/lottory48x6</a> (a list of
-              6 randomly picked integers between 1 and 48 in <b>html </b>format)</p>
-            <p><a href="/lottory36x7.txt">rndm.nu/lottory36x7.txt</a> (a
-              list of 7 randomly picked integers between 1 and 36 in <b>txt
-              </b>format)</p>
-          </div>
           <div>
             <p class="smallHeading">Range</p>
-            <p class="urlExample">[<b>range</b>] where <b>range </b>&gt;
-              1</p>
+            <p class="urlExample"><b>range</b> must be greater than 1</p>
+            <p class="urlExample">eg: <a href="/shuffle40">rndm.nu/lottery<b>102</b>-5</a></p>
             <p>Specifies the range of numbers to pick from.</p>
           </div>
           <div>
             <p class="smallHeading">Amount</p>
-            <p class="urlExample">[-<b>amount</b>] where <b>amount </b>&gt;
-              0 and <b>amount </b>&lt;= <b>range</b></p>
-            <p>Specifies the number of integers to pick and return</p>
+            <p class="urlExample"><b>amount</b> must be greater than 0 and less than or equal to <b>range</b></p>
+            <p class="urlExample">eg: <a href="/shuffle40">rndm.nu/lottery30-<b>12</b></a></p>
+            <p>Specifies the number of integers to pick and return.</p>
           </div>
         </div>
       </div>
       <div>
         <h2>Errors</h2>
-        <p>In the event of an error, such as badly formatted parameters,
-          the API will return an error object. An Error response will
-          always be associated with a <b>400 </b>HTTP status code.</p>
-        <p>The error object will have the following fields:</p>
-        <p class="listHeading">Error code</p>
+        <p>In the event of an error, such as badly formatted parameters, the API will return a response with a <b>4XX</b> HTTP status code. The body of the response will be html with human readable information about the error.</p>
+        <p>The response will contain the following HTTP headers you can use to retrive more information about the error programmatically:</p>
+        <p class="listHeading">rndm.nu-error-code</p>
         <p>An integer representing the error type id.</p>
-        <p class="listHeading">Language Code</p>
-        <p>The ISO 639-1 language code of the error name and
+        <p class="listHeading">rndm.nu-error-language</p>
+        <p>The ISO 639-1 language code of the error friendly name and
           description.</p>
-        <p class="listHeading">Friendly Name</p>
+        <p class="listHeading">rndm.nu-error-friendly-name</p>
         <p>A human readable name of the error.</p>
-        <p class="listHeading">Description</p>
+        <p class="listHeading">rndm.nu-error-description</p>
         <p>A human readable detailed description of the error.</p>
-        <p>The format of the error message will depend on what format is
-          specified in the parameters. If none are specified the '<b>accepts</b>'
-          header in the HTTP request will be used to choose the error
-          format. If neither the URL parameters or the 'accepts' header
-          specify a preference for a format, then <b>html </b>will be
-          used. The format of the error object can always be known by
-          checking the MIME type defined in the <b>Content-Type</b>
-          header in the HTTP response.<br>
-        </p>
-        <div>
-          <p class="smallHeading">JSON</p>
-          <p>A JSON format error object will be in the following format:</p>
-          <p class="code">{<br>
-            &nbsp;&nbsp;&nbsp; <b>errorCode</b>: [<b>Error Code</b>
-            (number)],<br>
-            &nbsp;&nbsp;&nbsp; <b>languageCode</b>: [<strong>Description</strong>
-            (string)]],<br>
-            &nbsp;&nbsp;&nbsp; <b>friendlyName</b>: [<b>Friendly Name</b>
-            (string),<br>
-            &nbsp;&nbsp;&nbsp; <b>description</b>: [<strong>Description</strong>
-            (string)]<br>
-            }</p>
-          <p>The MIME type is: 'json'</p>
-          <div class="example">
-            <p>eg:</p>
-            <p><a href="file:///parseError.json">rndm.nu/parseError.json</a><br>
-            </p>
-            <p><a href="/ja/parseError.json">rndm.nu/ja/parseError.json</a>
-              (Returns a JSON parsing error object with Japanese <b>friendlyname</b>
-              and <b>description</b>)</p>
-          </div>
-        </div>
-        <div>
-          <p class="smallHeading">BIN</p>
-          <p>A <b>BIN </b>format error object will be in the following
-            format:</p>
-          <p>byte 0-4: 32-bit unsigned big-endian integer representing
-            the <b>Error Code</b></p>
-          <p>byte 6-7: 2 ASCII characters representing the <b>Language
-              Code</b></p>
-          <p>byte 8-*: Null terminated UTF-8 string representing the <b>Friendly
-              Name</b> followed immediately by a second null terminated
-            UTF-8 string representing the <b>Description</b></p>
-          <p>The MIME type is: 'octet-stream'</p>
-          <div class="example">
-            <p>eg:</p>
-            <p><a href="/parseError.bin">rndm.nu/parseError.bin</a></p>
-          </div>
-        </div>
-        <div>
-          <p class="smallHeading">TXT</p>
-          <p>A <b>TXT</b> format error object will be in the following
-            format:</p>
-          <p class="code">Error Code: [<b>Error Code</b>],<br>
-            Language Code: [<b>Language Code</b>],<br>
-            Friendly Name: "[<b>Friendly </b><b>Name</b>]",<br>
-            Description: "[<b>Description</b>]"</p>
-          <p>The MIME type is: 'txt'</p>
-          <p>The field names on the left will appear in the language
-            represented by the language code.</p>
-          <div class="example">
-            <p>eg:</p>
-            <p><a href="file:///parseError.txt">rndm.nu/parseError.txt</a></p>
-            <p><a href="file:///parseError.txt">rndm.nu/es/parseError.txt</a></p>
-            <p>(Returns a TXT parsing error object with Spanish <b>friendly
-                name </b>and <b>description</b>)</p>
-          </div>
-        </div>
-        <div>
-          <p class="smallHeading">HTML</p>
-          <p><b>HTML</b> formats are aimed to be human readable and can
-            be viewed in a standard web browser. The MIME type is
-            'html'.</p>
-          <div class="example">
-            <p>eg:</p>
-            <p><a href="/parseError.html">rndm.nu/parseError.html</a></p>
-          </div>
+        
         </div>
       </div>
       <div>
@@ -334,13 +227,13 @@
         <p>Details about the current status of your quota can be read
           from any HTTP response headers which will always have the
           following headers:</p>
-        <p class="listHeading">x-number-quota-remaining</p>
+        <p class="listHeading">rndm.nu-number-quota-remaining</p>
         <p>The number of individual numbers remaining in your quota.</p>
-        <p class="listHeading">x-request-quota-remaining</p>
+        <p class="listHeading">rndm.nu-request-quota-remaining</p>
         <p>The number of requests remaining in your quota.</p>
-        <p class="listHeading">x-raw-binary-quota-remaining</p>
+        <p class="listHeading">rndm.nu-raw-binary-quota-remaining</p>
         <p>The number of raw binary bytes remaining in your quota.</p>
-        <p class="listHeading">x-quota-reset-date</p>
+        <p class="listHeading">rndm.nu-quota-reset-date</p>
         <p>The time and date that your quota will reset next in UCT
           format.</p>
         <p>For performance reasons the quota details described in these
@@ -350,10 +243,10 @@
         <p>or</p>
         <p><a href="http://rndm.nu/qouta.json">rndm.nu/qouta.json</a>
           which will return a JSON object with the following fields:</p>
-        <p><b>numberQuotaRemaining</b> (equivalent of <b>x-number-quota-remaining</b>)</p>
-        <p><b>requestQuotaRemaining</b> (equivalent of <b>x-request-quota-remaining</b>)</p>
-        <p><b>rawBinaryQuotaRemaining</b> (equivalent of <b>x-raw-binary-quota-remaining</b>)</p>
-        <p><b>quotaResetDate</b> (equivalent of <b>x-quota-reset-dat</b>)</p>
+        <p><b>numberQuotaRemaining</b> (equivalent of <b>rndm.nu-number-quota-remaining</b>)</p>
+        <p><b>requestQuotaRemaining</b> (equivalent of <b>rndm.nu-request-quota-remaining</b>)</p>
+        <p><b>rawBinaryQuotaRemaining</b> (equivalent of <b>rndm.nu-raw-binary-quota-remaining</b>)</p>
+        <p><b>quotaResetDate</b> (equivalent of <b>rndm.nu-quota-reset-dat</b>)</p>
       </div>
       <p> <button id="editButton">Edit this page</button> </p>
     </section>
