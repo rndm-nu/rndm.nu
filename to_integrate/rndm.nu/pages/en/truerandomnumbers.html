@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;
+      charset=windows-1252">
+    <title></title>
+    <style type="text/css">
+      body {
+          margin-top: 18px;
+          margin-bottom: 18px;
+          margin-left: 24px;
+          margin-right: 24px;
+          max-width: 800px;
+          font-family: sans-serif;
+      }
+      section {margin-top: 86px;margin-bottom: 86px;}
+      h1 { margin-top: 3em;} 
+      h2 { margin-top: 3em;} 
+      h3 { margin-top: 3em;} 
+      #editButton {margin-top: 3em;/* margin-bottom: 3em; */} 
+      #footer {margin-top: 2em;} 
+      #copyright {font-size: small;} 
+      .smallHeading {
+        margin-top: 3em;
+        font-weight: bold;
+      } 
+      #title {font-size: 2.5em;margin-top: 0em;margin-bottom:  0em;}
+      #subtitle {font-size: small;}
+      .listHeading { font-weight: bold;} 
+      .urlExample {font-size: small;}/* color:#7fad18;}*/
+      .example {margin-top: 1em;margin-left:  1em; font-size: small;} 
+      .code {font-family: monospace;}
+      .image {margin: 12px 0px;}
+      .testResult {font-size: small;}
+      .progressBar {
+          margin: 12px 0px;
+          width:420px; 
+          height:24px; 
+          background:black
+      }
+      a:link{text-decoration:underline; color:#000;} 
+      a:visited{text-decoration:underline; color:#000;} 
+      a:hover{text-decoration:underline; color:#`000;}
+
+
+        button {
+            font-size: medium;
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0px;
+            color: #1b1b1b;
+            background: #ffffff;
+            padding: 10px 20px 10px 20px;
+            border: solid #050505 2px;
+            outline: none;
+        }
+
+            button:hover {
+                border: solid #1b1b1b 4px;
+                padding: 8px 18px 8px 18px;
+                color: #1b1b1b;
+            }
+
+            button:active {
+                background: #1b1b1b;
+                color: #ffffff;
+            }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1 id="title">rndm.nu</h1>
+      <p id="subtitle">True Random Number Web Service</p>
+    </header>
+    <section>
+      <h2>True random numbers</h2>
+      <p>Random bits are provided from a hardware random number which
+        draws true random bits from quantum phenomena. Random bits are
+        buffered in multiple layers to ensure high throughput, low
+        latency and high availability.</p>
+      <h3>Hardware</h3>
+      <p>Random bits are prodced by the TrueRNG v3 device.</p>
+      <div style="width:520px; height:400px; background:black;"> <br>
+      </div>
+      <h3>Hardware certificates</h3>
+      <p>Random bits are prodced by the TrueRNG v3 device.</p>
+      <h3>Randomness sanity tests</h3>
+      <p>8 Mbit Gaussian distribution test</p>
+      <div class="image" style="width:520px; height:400px; background:black;"> <br>
+      </div>
+      <button>retest</button>
+      <h3>RFC 4086</h3>
+      <span class="testResult">
+        <p>passed - 15:66 10/1/2018 GMT+1</p>
+        <p>next run: 16:00 10/1/2018 GMT+1</p>
+        <p>test run in past 6 months: 3120</p>
+        <p>pass rate: 100%</p>
+      </span>
+      <h3>Pub 140-2</h3>
+      <span class="testResult">
+      <p>passed - 15:66 10/1/2018 GMT+1</p>
+      <p>next run: 16:00 10/1/2018 GMT+1</p>
+      <p>test run in past 6 months: 3120</p>
+      <p>pass rate: 100%</p>
+      </span>
+      <h3>RFC 4086</h3>
+      <span class="testResult">
+      <p>passed - 15:66 10/1/2018 GMT+1</p>
+      <p>next run: 16:00 10/1/2018 GMT+1</p>
+      <p>test run in past 6 months: 3120</p>
+      <p>pass rate: 100%</p>
+      </span>
+      <h3>NIST 800-90b</h3>
+      <span class="testResult">
+      <p>passed - 15:66 10/1/2018 GMT+1</p>
+      <p>next run: 16:00 10/1/2018 GMT+1</p>
+      <p>test run in past 6 months: 3120</p>
+      <p>pass rate: 100%</p>
+      </span>
+      <h3>Random bit buffer health</h3>
+      <div style="width:420px; height:300px; background:black;"> <br>
+      </div>
+      <p>The hardware random number generator fills a 4gb buffer of
+        random bits on our servers. This keeps our service highly
+        available and capable of servicing large spikes in random number
+        requests.</p>
+      <h3>Hardware random number generator uptime</h3>
+      <div style="width:420px; height:300px; background:black;"> <br>
+      </div>
+      <p>Online status: live <br>
+        Current uptime: 56 days 16 hours</p>
+    <p>
+      <button id="editButton">Edit this page</button>
+    </p>
+    </section>
+    <footer>
+      <div id="footer">
+        <p>
+          <span>Pages</span><br>
+          <a href="index.html">rndm.nu</a><br>        
+          <a href="entropysource.html">true random numbers</a><br>
+          <a href="api.html">api</a><br>
+          <a href="qouta.html">qouta</a><br>
+          <a href="patreon.html">patreon</a>
+        </p>
+        <p>
+          <span>Language</span><br>
+          <a href="">English</a><br>        
+          <a href="">French</a><br>
+          <a href="">Chinese</a><br>
+          <a href="">Japanese</a><br>
+          <a href="">Russian</a>
+        </p>
+        <p id="copyright">&copy; rndm.nu 2018</p>
+      </div>
+    </footer>
+  </body>
+</html>

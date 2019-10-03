@@ -1,0 +1,344 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html style="font-family: sans-serif;">
+  <head>
+    <meta http-equiv="content-type" content="text/html;
+      charset=windows-1252">
+    <title>sfsdf</title>
+  </head>
+  <body>
+    <header>
+      <h1>rndm.nu</h1>
+      <p>True Random Number Web Service</p>
+    </header>
+    <section>
+      <h2><br>
+      </h2>
+      <h2>API</h2>
+      <p><font size="-1">rndm.nu/{<b>language</b>/}{<b>mode</b>}[<b>mode
+            options</b>]{.<b>format</b>}</font><br>
+      </p>
+      <p>rndm.nu provides a simple URL based API to retrieve true random
+        numbers in all sorts of formats. The API is easy to use for both
+        humans and programs alike. Above is the basic format which every
+        API request to rndm.nu must use. Parameter names are are in <b>bold</b>.
+        Optional parameters are surrounded by {curly brackets}.
+        Mandatory parameters are surrounded by [square brackets]. Below
+        the parameters and how to use them are described in detail with
+        examples for each use case.<br>
+      </p>
+      <p><b><br>
+          Language</b><br>
+      </p>
+      <p><font size="-1">{<b>language</b>/} where <b>language </b>must
+          be either '<b>en</b>', '<b>es</b>', '<b>ja</b>' or '<b>ch</b>'</font><br>
+      </p>
+      <p>Represents the ISO 639-1 language code of the language you
+        prefer error messages to use. If not provided the the language
+        will be chosen from the <b>Accept-Language</b> header in the
+        HTTP request. If no preference is provided in <b>Accept-Language</b>
+        the language will default to '<b>en</b>'.<br>
+      </p>
+      <p><b><br>
+          Mode</b></p>
+      <p><font size="-1">[<b>mode</b>] where <b>mode </b>must be
+          either '<b>standard</b>', '<b>binary</b>', '<b>shuffle</b>' or
+          '<b>lottery</b>'</font></p>
+      <p>The <b>mode </b>parameter determines what kind of random
+        numbers you want in your response. If <b>mode </b>is not
+        provided it will default to '<b>standard</b>'. Each <b>mode </b>and
+
+
+
+
+
+        it's corresponding <b>mode options</b> are described further
+        down.<br>
+      </p>
+      <p> </p>
+      <p><b><br>
+          Format</b></p>
+      <p><font size="-1">{.<b>format</b>} where <b>format </b>is
+          either '<b>html</b>', '<b>txt</b>', '<b>json</b>' or '<b>bin</b>'</font></p>
+      <p>Represents the format you want the numbers returned in.
+        Defaults to <b>html</b>. If format is not provided in the URL
+        it can be set by specifying the corresponding MIME type in the
+        HTTP request '<b>accepts</b>' headers.</p>
+      <p><b>html </b>(MIME type: 'html') : Web-browser view-able HTML
+        result.</p>
+      <p><b>txt </b>(MIME type: 'txt'): human readable text response,
+        also easily parse-able programmatically.</p>
+      <p><b>json </b>(MIME type: 'json'): returns numbers in JSON
+        format.</p>
+      <p><b>bin </b>(MIME type: 'octet-stream'): returns numbers in
+        binary format. Each number is a 64-bit integer in big-endian
+        format.</p>
+      <h3><br>
+      </h3>
+      <h2>Modes<br>
+      </h2>
+      <h3>Standard mode </h3>
+      <p><font size="-1">/[<b>range</b>]{x<b>multiplier</b>}{.<b>format</b>}<br>
+          <br>
+        </font>Standard mode returns well formatted random numbers with
+        many formatting options.</p>
+      <p><b><br>
+          Range</b></p>
+    </section>
+    <section><font size="-1">[<b>range</b>] where <b>range</b><b> </b>&gt;
+
+        1 or [<b>range</b><b>1</b>-<b>range</b><b>2</b>] where <b>range</b><b>2
+        </b>&gt; <b>range</b><b>1 </b>and <b>range</b><b>1 </b>&gt;=
+        0</font></section>
+    <section>
+      <p>Represents the integer range a random number will be picked
+        from.</p>
+      <p>eg:</p>
+      <p>5 (number between 1 and 5)</p>
+      <p>6-8 (number between 6 and 8)</p>
+      <p><b><br>
+          Multiplier</b></p>
+      <p><font size="-1">{x<b>multiplier</b>} where <b>multiplier </b>&gt;
+
+          0</font></p>
+      <p>Represents how many individual random numbers you want
+        returned.</p>
+      <p>eg:</p>
+      <p>x10 (10 random numbers)</p>
+    </section>
+    <section>
+      <p> <br>
+        eg: </p>
+      <p><a href="/10">rndm.nu/10</a> (a random number between 1 and 10
+        in html format)</p>
+      <p><a href="/5x100.txt">rndm.nu/5x100.txt</a> (100 random numbers
+        between 1 and 5 in text format)</p>
+      <p><a href="/5x100.txt">rndm.nu/3-4.bin</a> (a random number
+        between 3 and 5 in binary format)</p>
+      <p><a href="/500-600x1000.json">rndm.nu/500-600x1000.json</a>
+        (1000 random numbers between 500 and 600 in json format)<br>
+      </p>
+      <h3><br>
+      </h3>
+      <h3>Binary mode</h3>
+      <p><font size="-1">/binary[<b>amount</b>]<br>
+          <br>
+        </font>Returns a stream of pure unbiased random bytes. Binary
+        mode will only return a <b>bin </b>format response. <b>html</b>,
+        <b>txt </b>and <b>json </b>formats are not supported in
+        Binary mode.<br>
+      </p>
+      <p><b><br>
+          Amount</b></p>
+      <p><font size="-1">[<b>amount</b>] where <b>amount </b>&gt; 0</font></p>
+      <p>Specifies the number of bytes you wish to be returned.</p>
+      <p> <br>
+        eg: </p>
+      <p><a href="/binary50">rndm.nu/binary50</a> (returns 50 random
+        bytes)</p>
+      <p><a href="/binary1024">rndm.nu/binary1024</a> (returns 1kb of
+        random bytes)<br>
+      </p>
+      <h3><br>
+      </h3>
+      <h3>Shuffle mode </h3>
+      <p><font size="-1">/shuffle[<b>length</b>]</font></p>
+      <p>Shuffles a consecutive set of integers.</p>
+      <p><b><br>
+          Length</b></p>
+      <p><font size="-1">[<b>length</b>] where <b>length </b>&gt; 1</font></p>
+      <p>Specifies the the length of the shuffled number list.</p>
+      <p> <br>
+        eg: </p>
+      <p><a href="/shuffle100">rndm.nu/shuffle100</a> (a shuffled list
+        of numbers from 1 to 100 in <b>html </b>format)</p>
+      <p><a href="/shuffle1024.json">rndm.nu/shuffle1024.json</a> (a
+        shuffled list of numbers from 1 to 1024 in <b>json </b>format)<br>
+      </p>
+      <h3><br>
+      </h3>
+      <h3>Lottery mode </h3>
+    </section>
+    <p>Randomly picks a specified amount of distinct integers from a
+      range of integers.</p>
+    <p><font size="-1">/lottery[<b>range</b>][x<b>amount</b>]{.<b>format</b>}</font></p>
+    <p><b><br>
+        Range</b></p>
+    <p><font size="-1">[<b>range</b>] where <b>range </b>&gt; 1</font></p>
+    <p>Specifies the range of numbers to pick from.</p>
+    <p><b><br>
+        Amount</b></p>
+    <p><font size="-1">[x<b>amount</b>] where <b>amount </b>&gt; 0 and
+        <b>amount </b>&lt;= <b>range</b></font></p>
+    <p>Specifies the number of integers to pick and return<br>
+      <br>
+    </p>
+    <p> </p>
+    <p>eg:</p>
+    <p><a href="/lottory48x6">rndm.nu/lottory48x6</a> (a list of 6
+      randomly picked integers between 1 and 48 in <b>html </b>format)</p>
+    <p><a href="/lottory36x7.txt">rndm.nu/lottory36x7.txt</a> (a list of
+      7 randomly picked integers between 1 and 36 in <b>txt </b>format)
+
+
+
+
+    </p>
+    <p> <br>
+    </p>
+    <h2>Errors</h2>
+    In the event of an error, such as badly formatted parameters, the
+    API will return an error object. An Error response will always be
+    associated with a <b>400 </b>HTTP status code.<br>
+    <br>
+    The error object will have the following fields:<br>
+    <br>
+    <p><strong>Error code<br>
+      </strong></p>
+    <p>An integer representing the error type id.<br>
+    </p>
+    <p><strong>Language Code<br>
+      </strong></p>
+    <p>The ISO 639-1 language code of the error name and description.</p>
+    <p><strong>Friendly Name</strong></p>
+    <p>A human readable name of the error.<br>
+    </p>
+    <p><strong>Description</strong></p>
+    <p>A human readable detailed description of the error.</p>
+    <p>The format of the error message will depend on what format is
+      specified in the parameters. If none are specified the '<b>accepts</b>'
+      header in the HTTP request will be used to choose the error
+      format. If neither the URL parameters or the 'accepts' header
+      specify a preference for a format, then <b>html </b>will be
+      used. The format of the error object can always be known by
+      checking the MIME type defined in the <b>Content-Type</b> header
+      in the HTTP response.<br>
+    </p>
+    <p><b><br>
+        JSON<br>
+      </b></p>
+    <p>A JSON format error object will be in the following format:<br>
+    </p>
+    <p><tt>{</tt><tt><br>
+      </tt><tt>&nbsp;&nbsp;&nbsp; <b>errorCode</b>: [<b>Error Code</b></tt><tt>
+        (number)],</tt><tt><br>
+      </tt><tt> &nbsp;&nbsp;&nbsp; <b>languageCode</b>: [</tt><tt><strong>Description</strong>
+        (string)]],</tt><tt><br>
+      </tt><tt> &nbsp;&nbsp;&nbsp; <b>friendlyName</b>: [<b>Friendly
+          Name</b> (string),</tt><tt><br>
+      </tt><tt> &nbsp;&nbsp;&nbsp; <b>description</b>: [</tt><tt><strong>Description</strong></tt><tt>
+        (string)</tt><tt>]<br>
+      </tt><tt>}<br>
+      </tt></p>
+    <p>The MIME type is: 'json'<br>
+    </p>
+    <p>eg:<br>
+    </p>
+    <p><a href="file:///parseError.json">rndm.nu/parseError.json</a><br>
+    </p>
+    <p><a href="/ja/parseError.json">rndm.nu/ja/parseError.json</a>
+      (Returns a JSON parsing error object with Japanese <b>friendly
+        name</b> and <b>description</b>)<tt><br>
+      </tt></p>
+    <p><b><br>
+        BIN<br>
+      </b></p>
+    <p>A <b>BIN </b>format error object will be in the following
+      format:<br>
+    </p>
+    <p>byte 0-4: 32-bit unsigned big-endian integer representing the <b>Error
+
+
+
+
+
+
+        Code</b><br>
+      byte 6-7: 2 ASCII characters representing the <b>Language Code</b><br>
+      byte 8-*: Null terminated UTF-8 string representing the <b>Friendly
+
+
+
+        Name</b> followed immediately by a second null terminated UTF-8
+      string representing the <b>Description</b><tt><br>
+      </tt> </p>
+    <p>The MIME type is: 'octet-stream'</p>
+    <p>eg:<br>
+    </p>
+    <p><a href="/parseError.bin">rndm.nu/parseError.bin<br>
+      </a></p>
+    <p><b><br>
+        TXT</b><br>
+    </p>
+    <p>A <b>TXT </b>format error object will be in the following
+      format:<br>
+    </p>
+    <tt>Error Code: [<b>Error Code</b>],</tt><tt><br>
+    </tt><tt>Language Code: [<b>Language Code</b>],</tt><tt><br>
+    </tt><tt>Friendly Name: "[</tt><tt><b>Friendly </b></tt><tt><b>Name</b></tt><tt>]",</tt><tt><br>
+    </tt><tt>Desc</tt><tt>ription: "[</tt><tt><b>Description</b></tt><tt>]"</tt><br>
+    <br>
+    The MIME type is: 'txt'<br>
+    <br>
+    The field names on the left will appear in the language represented
+    by the language code.<br>
+    <br>
+    eg:<br>
+    <br>
+    <a href="file:///parseError.txt">rndm.nu/parseError.txt</a><br>
+    <br>
+    <a href="file:///parseError.txt">rndm.nu/es/parseError.txt</a>
+    (Returns a TXT parsing error object with Spanish <b>friendly name </b>and
+
+
+
+
+
+    <b> description</b>)<br>
+    <p><b><br>
+        HTM</b><b>L</b><br>
+    </p>
+    <p><b>HTML </b>formats are aimed to be human readable. The MIME
+      type is 'html'. Examples can be seen here:<br>
+    </p>
+    <p><a href="/parseError.html">rndm.nu/parseError.html</a><br>
+    </p>
+    <h2><br>
+    </h2>
+    <h2>Quota</h2>
+    <p>rndm.nu uses an IP based quota system to help prevent exhausting
+      resources. More details on the quota system can be read at <a
+        href="http://rndm.nu/qouta">rndm.nu/qouta</a>.</p>
+    <p>Details about the current status of your quota can be read from
+      any HTTP response headers which will always have the following
+      headers:</p>
+    <p><strong>x-number-quota-remaining</strong></p>
+    <p>The number of individual numbers remaining in your quota.</p>
+    <p><strong>x-request-quota-remaining</strong></p>
+    <p>The number of requests remaining in your quota.</p>
+    <p><strong>x-raw-binary-quota-remaining</strong></p>
+    <p>The number of raw binary bytes remaining in your quota.</p>
+    <p><strong>x-quota-reset-date</strong></p>
+    <p>The time and date that your quota will reset next in UCT format.</p>
+    <p> <br>
+    </p>
+    <p>For performance reasons the quota details described in these
+      headers are not guaranteed to be 100% up to date. For guaranteed
+      up to date quota details go to:</p>
+    <p><a href="http://rndm.nu/qouta">rndm.nu/qouta</a></p>
+    <p>or&nbsp;</p>
+    <p><a href="http://rndm.nu/qouta.json">rndm.nu/qouta.json</a> which
+      will return a JSON object with the following fields:</p>
+    <p><strong>numberQuotaRemaining </strong>(equivalent of
+      x-number-quota-remaining)</p>
+    <p><strong>requestQuotaRemaining </strong>(equivalent of
+      x-number-quota-remaining)</p>
+    <p><strong>rawBinaryQuotaRemaining </strong>(equivalent of
+      x-number-quota-remaining)</p>
+    <p><strong>quotaResetDate </strong>(equivalent of
+      x-number-quota-remaining)<br>
+    </p>
+    <p><br>
+      <a href="github.com/">Edit this page</a><br>
+    </p>
+  </body>
+</html>

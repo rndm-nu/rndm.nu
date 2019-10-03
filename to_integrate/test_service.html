@@ -1,0 +1,119 @@
+<html><head>
+  <link href="https://fonts.googleapis.com/css?family=Cardo:400,700|Oswald" rel="stylesheet">
+  <style type="text/css">
+  body {
+    margin: 10 40px;
+    font-family: sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    margin: 0px;
+  }
+
+  h1 {
+    font-size: 4em;
+  }
+  h2 {
+    margin-top: 20px;
+  }
+  h3 {
+    margin-top: 14px;
+  }
+  .grid {
+      display: grid;
+      max-width: 1000px;
+      min-width: 500px;
+      margin: auto;
+      grid-template-columns: repeat(3, 1fr);
+      grid-gap: 10px;
+  }
+  .span-col-3{grid-column: span 3 / auto;}
+    .span-col-2{grid-column: span 2 / auto;}
+
+  .span-row-3{grid-row: span 3 / auto;}
+
+  .headerDiv {min-height: 160px;}
+
+  .code {font-family: monospace;}
+
+  a {
+    color: black;
+  }
+
+  .rerun-button {
+
+      display: inline;
+      background: white;
+      padding: 3 5px;
+      margin: 5px;
+      font-size: 14px;
+      color: white;
+      cursor: pointer;
+      white-space: nowrap;
+      user-select: none;
+  }
+
+  .rerun-button:hover {
+      background: black;
+
+  }
+  </style>
+</head>
+<body>
+
+
+
+
+
+<div class="grid">
+  <div class="span-col-3 headerDiv">
+    <div style="
+    float: right;
+    margin-top: 22;
+">about&nbsp;&nbsp;&nbsp;api&nbsp;&nbsp;&nbsp;service health&nbsp;&nbsp;&nbsp;qouta&nbsp;&nbsp;&nbsp;account&nbsp;&nbsp;&nbsp;GB</div><h1>RNDM.NU</h1>
+    <span>random number web api</span>
+    
+  </div>
+  <div class="span-col-3 span-row-1"><h2>SERVICE HEALTH</h2></div>
+  <div class="span-col-2" style="
+    background-image: url('world.svg');
+    background-size: cover;
+    padding-top: 50%;
+"></div>
+  <div><h3 style="margin: -0.36em 0px 0px 0px;">
+    New York</h3>
+    ping time <span style="float: right">22ms</span><br>
+    download time <span style="float: right">180ms</span><br>
+   
+</div>
+  <div class="span-col-3 span-row-1">A health test is run on rndm.nu every 10 minutes. A call is made to rndm.nu/binary1000000 from many locations around the world. The ping time and total download tiem is recorded.</div>
+  <div>Last test run</div>
+  <div class="span-col-2">3 minutes ago</div>
+  <div>Average global ping time</div>
+  <div class="span-col-2">80ms</div>
+  <div class="span-col-3 span-row-1"><h2>UPTIME</h2></div>
+    <div class="span-col-2" style="
+    background: black;
+    min-height: 140px;
+"></div>
+<div><h3 style="
+    margin: -0.36em 0px 0px 0px;
+">02/10/2019</h3>
+  Uptime: 100%<br>
+  Average global ping time: 22ms
+  </div>
+  <div>Uptime over past 90 days</div>
+  <div>100%</div>
+  <div></div>
+  <div class="span-col-3" style="
+    margin: 100 0 40 0px;
+">
+    <span style="/* margin-top: 180px; */float: right; font-family: 'Oswald'">©TANK Studios LTD 2019</span>
+    
+  </div>
+</div>
+
+
+
+</body></html>

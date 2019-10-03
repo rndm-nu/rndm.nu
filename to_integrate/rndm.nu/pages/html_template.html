@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <title>True Random Number Web Service</title>
+    <style type="text/css" style="display: none">
+        body {
+            margin-top: 24px;
+            margin-bottom: 24px;
+            margin-left: 36px;
+            margin-right: 36px;
+            max-width: 800px;
+            font-family: sans-serif;
+            color:;
+        }
+        .single {
+            font-size: xx-large
+        }
+
+        .list {
+            font-size: large
+        }
+
+        button {
+            font-size: medium;
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0px;
+            color: #1b1b1b;
+            background: #ffffff;
+            padding: 10px 20px 10px 20px;
+            border: solid #050505 2px;
+            outline: none;
+            margin-right: 12px;
+        }
+
+            button:hover {
+                border: solid #1b1b1b 4px;
+                padding: 8px 18px 8px 18px;
+                color: #1b1b1b;
+            }
+
+            button:active {
+                background: #1b1b1b;
+                color: #ffffff;
+            }
+    </style>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114997779-1"></script>
+    <script>
+        function gtag() { dataLayer.push(arguments) } window.dataLayer = window.dataLayer || [], gtag("js", new Date), gtag("config", "UA-114997779-1"), document.addEventListener("copy", function (a) { a.clipboardData.setData("text/plain", document.getElementById("a").innerHTML), a.preventDefault() });
+    </script>
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="robots" content="noindex, follow">
+</head>
+	<body>
+        <section>
+        	<h1>#{title}</h1>
+            <p id="a" class="#{dataType}">#{data}</p>
+            <button onclick="location.reload();">refresh</button>
+            <button onclick="document.execCommand('copy');">copy to clipboard</button>
+        </section>
+	</body>
+</html>

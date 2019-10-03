@@ -1,0 +1,116 @@
+﻿<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Cardo:400,700|Oswald" rel="stylesheet">
+    <style type="text/css">
+        body {
+            margin: 10px 40px;
+            font-family: Helvetica, sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            margin: 0px;
+        }
+
+        h1 {
+            font-size: 4em;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+
+        h3 {
+            margin-top: 14px;
+        }
+
+        .grid {
+            display: grid;
+            max-width: 1000px;
+            min-width: 500px;
+            margin: auto;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 10px;
+            grid-template-rows: auto auto auto 1fr;
+            min-height: 100%;
+        }
+        
+        .span-col-3 {
+            grid-column: span 3 / auto;
+        }
+        .span-col-2 {
+            grid-column: span 2 / auto;
+        }
+
+        .span-row-3 {
+            grid-row: span 3 / auto;
+        }
+
+        .headerDiv {
+            min-height: 160px;
+        }
+
+        .code {
+            font-family: monospace;
+        }
+
+        a {
+            color: black;
+        }
+
+        .rerun-button {
+            display: inline;
+            background: white;
+            padding: 3 5px;
+            margin: 5px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+            .rerun-button:hover {
+                background: black;
+            }
+
+            button {
+            font-size: medium;
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0px;
+            color: #1b1b1b;
+            background: #ffffff;
+            padding: 10px 20px 10px 20px;
+            border: solid #050505 2px;
+            outline: none;
+            width: 100%
+        }
+            button:hover {
+                border: solid #1b1b1b 4px;
+                padding: 8px 18px 8px 18px;
+                color: #1b1b1b;
+            }
+
+            button:active {
+                background: #1b1b1b;
+                color: #ffffff;
+            }
+    </style>
+</head>
+<body>
+
+
+
+
+
+    <div class="grid">
+        <div class="span-col-3 headerDiv">
+            <div style="
+    float: right;
+    margin-top: 22;
+">about&nbsp;&nbsp;&nbsp;api&nbsp;&nbsp;&nbsp;service health&nbsp;&nbsp;&nbsp;qouta&nbsp;&nbsp;&nbsp;account&nbsp;&nbsp;&nbsp;GB</div><h1>RNDM.NU</h1>
+            <span>random number web api</span>
+
+        </div>

@@ -14,20 +14,31 @@
           font-family: sans-serif;
           color:;
       }
-      section {margin-top: 86px;margin-bottom: 86px;}
-      h1 { margin-top: 5em;} 
-      h2 { margin-top: 5em;} 
+      section {margin-top: 120px;margin-bottom: 120px;}
+      h1 { 
+        margin-top: 3em;
+        font-size: 2.5em
+      } 
+      h2 { margin-top: 3em;} 
       h3 { margin-top: 3em;} 
       #editButton {margin-top: 3em;/* margin-bottom: 3em; */} 
       #footer {margin-top: 2em;} 
-      #copyright {font-size: small;} 
+      #copyright {
+        font-size: small;
+        margin-top: 2em;
+        margin-bottom: 2em;
+      } 
       .smallHeading {
         margin-top: 3em;
         font-weight: bold;
       } 
-      #title {font-size: 2.5em;margin-top: 0em;margin-bottom:  0em;}
+      #title {margin-top: 0em;margin-bottom:  0em;}
       #subtitle {font-size: small;}
-      .listHeading { font-weight: bold;} 
+      .listHeading { 
+        font-weight: bold;
+        margin-top: 2em;
+        font-family: monospace;
+      } 
       .urlExample {font-size: small;}/* color:#7fad18;}*/
       .example {margin-top: 1em;margin-left:  1em; font-size: small;} 
       .code {font-family: monospace;}
@@ -98,19 +109,6 @@
           the language will default to '<b>en</b>'. </p>
       </div>
       <div>
-        <p class="smallHeading">Mode</p>
-        <p class="urlExample"><b>mode</b> must be either '<b>standard</b>', '<b>binary</b>', '<b>shuffle</b>' or '<b>lottery</b>'</p>
-        <p class="urlExample">default value is '<b>standard</b>'</p>
-        <p class="urlExample">eg: <a href="/binary1024">rndm.nu/<b>binary</b>1024</a></p>
-
-
-        <p>The <b>mode</b> parameter determines what kind of random
-          numbers you want in your response. If <b>mode </b>is not
-          provided it will default to '<b>standard</b>'. Each <b>mode </b>and
-          it's corresponding <b>mode options</b> are described further
-          down. </p>
-      </div>
-      <div>
         <p class="smallHeading">Format</p>
         <p class="urlExample"><b>format</b> must be
           either '<b>html</b>', '<b>txt</b>', '<b>json</b>' or '<b>bin</b>'</p>
@@ -129,6 +127,19 @@
         <p><b>bin </b>(MIME type: 'octet-stream'): returns numbers in
           binary format. Each number is a 64-bit integer in big-endian
           format.</p>
+      </div>
+      <div>
+        <p class="smallHeading">Mode</p>
+        <p class="urlExample"><b>mode</b> must be either '<b>standard</b>', '<b>binary</b>', '<b>shuffle</b>' or '<b>lottery</b>'</p>
+        <p class="urlExample">default value is '<b>standard</b>'</p>
+        <p class="urlExample">eg: <a href="/binary1024">rndm.nu/<b>binary</b>1024</a></p>
+
+
+        <p>The <b>mode</b> parameter determines what kind of random
+          numbers you want in your response. If <b>mode </b>is not
+          provided it will default to '<b>standard</b>'. Each <b>mode </b>and
+          it's corresponding <b>mode options</b> are described further
+          down. </p>
       </div>
       <div>
         <h2>Mode and Mode Options</h2>
@@ -224,6 +235,7 @@
         <p>rndm.nu uses an IP based quota system to help prevent
           exhausting resources. More details on the quota system can be
           read at <a href="http://rndm.nu/qouta">rndm.nu/qouta</a>.</p>
+        <p class="smallHeading">HTTP Response Headers</p>
         <p>Details about the current status of your quota can be read
           from any HTTP response headers which will always have the
           following headers:</p>
@@ -236,6 +248,8 @@
         <p class="listHeading">rndm.nu-quota-reset-date</p>
         <p>The time and date that your quota will reset next in UCT
           format.</p>
+        <div>
+        <p class="smallHeading">Quota page</p>
         <p>For performance reasons the quota details described in these
           headers are not guaranteed to be 100% up to date. For
           guaranteed up to date quota details go to:</p>
@@ -243,10 +257,15 @@
         <p>or</p>
         <p><a href="http://rndm.nu/qouta.json">rndm.nu/qouta.json</a>
           which will return a JSON object with the following fields:</p>
-        <p><b>numberQuotaRemaining</b> (equivalent of <b>rndm.nu-number-quota-remaining</b>)</p>
-        <p><b>requestQuotaRemaining</b> (equivalent of <b>rndm.nu-request-quota-remaining</b>)</p>
-        <p><b>rawBinaryQuotaRemaining</b> (equivalent of <b>rndm.nu-raw-binary-quota-remaining</b>)</p>
-        <p><b>quotaResetDate</b> (equivalent of <b>rndm.nu-quota-reset-dat</b>)</p>
+        <p class="listHeading">numberQuotaRemaining</p> 
+        <p>Equivalent of <b>rndm.nu-number-quota-remaining</b>.</p>
+        <p class="listHeading">requestQuotaRemaining</p> 
+        <p>Equivalent of <b>rndm.nu-request-quota-remaining</b>.</p>
+        <p class="listHeading">rawBinaryQuotaRemaining</p> 
+        <p>Equivalent of <b>rndm.nu-raw-binary-quota-remaining</b>.</p>
+        <p class="listHeading">quotaResetDate</p> 
+        <p>Equivalent of <b>rndm.nu-quota-reset-date</b>.</p>
+      </div>
       </div>
       <p> <button id="editButton">Edit this page</button> </p>
     </section>

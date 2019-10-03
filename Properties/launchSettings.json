@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "SuaveOnly": {
+      "commandName": "Project",
+      "commandLineArgs": "8080 --devMachine"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "commandLineArgs": "8080"
+    }
+  }
+}
