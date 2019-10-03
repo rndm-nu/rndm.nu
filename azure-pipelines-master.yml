@@ -32,7 +32,7 @@ steps:
     SourceFolder: '.git/refs/remotes/origin'
     Contents: 'master'
     TargetFolder: '$(Build.ArtifactStagingDirectory)/git/refs/remotes/origin'
-- script: dotnet publish "Epic Pen Website.sln" /p:DefineConstants=ENV_AZURELIVE --configuration $(buildConfiguration) -r win10-x64 -o $(Build.ArtifactStagingDirectory)
+- script: dotnet publish "rndm.nu.sln" /p:DefineConstants=ENV_AZURELIVE --configuration $(buildConfiguration) -r win10-x64 -o $(Build.ArtifactStagingDirectory)
   displayName: 'dotnet build $(buildConfiguration)'
 - script: 'tsc --removeComments --outDir "$(Build.ArtifactStagingDirectory)\Static\tsout" --project "$(Build.SourcesDirectory)\TypeScript"'
   displayName: 'TypeScript build'
