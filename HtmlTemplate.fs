@@ -155,5 +155,4 @@ module HtmlTemplate =
         )
         |> String.concat ""
     
-    let rr = createPageResponse("payment", Map.empty, HttpContext.empty)
     let t = ()
