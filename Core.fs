@@ -51,7 +51,7 @@ module Core =
             
     let staticFileRoot =
         match env with
-        | AzureLive | AzureDev -> sprintf "%s/%s/" CDNURL gitCommitHashShort
+        //| AzureLive | AzureDev -> sprintf "%s/%s/" CDNURL gitCommitHashShort
         | _ -> sprintf "/%s/" gitCommitHashShort
 
 
