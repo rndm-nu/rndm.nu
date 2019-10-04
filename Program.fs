@@ -15,28 +15,6 @@ module App =
     open GoogleMeasurementProtocol
     open GoogleMeasurementProtocol.Parameters.ContentInformation
 
-    let installers =
-        Directory.EnumerateFiles(Path.Combine(Core.rootDir, "Installers"))
-        |> Seq.map(fun fp ->
-            let version =
-                Path.GetFileNameWithoutExtension(fp).Replace("EpicPenSetup-v","").Split('.')
-                |> Array.map(int)
-            version, Path.GetFileName(fp)
-        )
-        |> Seq.toList
-        |> List.sortBy(fun (num, _) -> 
-            [
-                num.[0] |> uint64 |> (*) (256uL*256uL*256uL)
-                num.[1] |> uint64 |> (*) (256uL*256uL)
-                num.[2] |> uint64 |> (*) (256uL)
-                num.[3] |> uint64 
-            ] |> List.sum
-        )
-        |> List.rev
-        
-    let latestInstallerString = installers |> List.item 0 |> fun (ints, _) -> sprintf "%i.%i.%i" ints.[0] ints.[1] ints.[2]
-    let latestInstallerShortString = installers |> List.item 0 |> fun (ints, _) -> sprintf "%i.%i" ints.[0] ints.[1]
-
     let functions =
         typeof<Functions.Marker>.DeclaringType.GetMethods()
         |> Array.map (fun methodInfo ->
@@ -155,101 +133,27 @@ module App =
      
                 | None ->
                     let t = ctx.response.content
-                    if reqPath.StartsWith("/download") then
-                        ()
-                        System.Diagnostics.Trace.TraceInformation(sprintf "length: %i" (reqPath.Split('/')).Length)
-                        match reqPath.Split('/') with
-                        | [|_;_;version|] ->
-                                
-                            let verInt = version.Split('.') |> Array.map int
-                            let verString = (verInt |> Array.map string |> fun strs -> String.Join(".", strs))
-                           
-
-                            
-                    
-                            ctx
-                            |> Files.browseFile (Path.Combine(Core.rootDir, "Installers")) (installers |> List.find (fun (a,b) -> a.[0] = verInt.[0] && a.[1] = verInt.[1] && a.[2] = verInt.[2] && a.[3] = verInt.[3]) |> snd)
-                            |>  Async.map(
-                                        fun o ->
-                                        match o with
-                                        | Some ctx -> 
-                                            Some {
-                                                ctx with 
-                                                    response = {
-                                                        ctx.response with 
-                                                            headers = 
-                                                                let installerVersion = (installers |> List.item 0 |> fst)
-                                                                [
-                                                                    "Content-Type",                 "application/vnd.microsoft.portable-executable"
-                                                                    "content-disposition",          sprintf "attachment; filename=\"Epic Pen Setup v%s.exe\"" verString
-                                                                    "Access-Control-Allow-Origin",  "https://epicpenwebsitedev.azurewebsites.net"
-                                                                    "Cache-Control",                "public, immutable, max-age=31536000"
-                                                                ]
-                                                    }
-                                            }
-                                        | None -> None
-                            )
-                        | _ ->
-                            
-                            let installerVersion = (installers |> List.item 0 |> fst)
-                            match ((ctx.request.headers |> Map.ofList) |> Map.tryFind "client-ip") with
-                            | Some valu -> 
-                                let ip = valu.Split(':').[0]
-                                
-                                let verString = (installerVersion |> Array.map string |> fun strs -> String.Join(".", strs))
-                                let factory = GoogleMeasurementProtocol.GoogleAnalyticsRequestFactory("UA-68962371-5");
-                    
-                                let googleRequest = factory.CreateRequest(HitTypes.PageView, [GoogleMeasurementProtocol.Parameters.TrafficSources.DocumentReferrer(ctx.request.headers |> List.tryFind (fun (key,_) -> key.ToLowerInvariant() = "referer") |> (function | Some (_, str) -> str | None -> "")) ])
-                    
-                                googleRequest.Parameters.Add(DocumentHostName("epic-pen.com"));
-                                googleRequest.Parameters.Add(DocumentPath(sprintf "/download/%s" verString));
-                                googleRequest.Parameters.Add(DocumentTitle("Download"));
-                    
-                                googleRequest.Parameters.Add(new Parameters.Session.IpOverride(ip));
-                                googleRequest.Parameters.Add(new Parameters.Session.UserAgentOverride(ctx.request.headers |> List.tryFind (fun (key,_) -> key.ToLowerInvariant() = "user-agent") |> (function | Some (_, str) -> str | None -> "")  ))
-                    
-                                let clientId = GoogleMeasurementProtocol.Parameters.User.ClientId(Guid.NewGuid());
-                                googleRequest.PostAsync(clientId) |> Async.AwaitTask |> Async.Start
-                            | None ->  ()
-                            
-                            { ctx with
-                                response = { 
-                                    ctx.response with
-                                        status = HTTP_307.status
-                                        headers = 
-                                            [
-                                                ctx.response.headers
-                                                [ 
-                                                    "Content-Type", "application/vnd.microsoft.portable-executable"
-                                                    "location",     sprintf "%sdownload/%i.%i.%i.%i" Core.staticFileRoot installerVersion.[0] installerVersion.[1] installerVersion.[2] installerVersion.[3] 
-                                                ]
-                                            ]
-                                            |> List.concat
-                                }
-                            }
-                            |> succeed
-                    else
                         //Console.WriteLine("[SUAVE] {0}", Path.Combine(HtmlTemplate.rootDir, "Static"));
-                        ctx
-                        |> Files.browseFile (Path.Combine(Core.rootDir, "Static")) path
-                        |>  Async.map(
-                                    fun o ->
-                                    match o with
-                                    | Some ctx -> 
-                                        Some {
-                                            ctx with 
-                                                response = {
-                                                    ctx.response with 
-                                                        headers = 
-                                                            [
-                                                                "Access-Control-Allow-Origin", "https://epicpenwebsitedev.azurewebsites.net"
-                                                                "Cache-Control", "public, immutable, max-age=31536000"
-                                                            ]
-                                                            |> List.append ctx.response.headers
-                                                }
-                                        }
-                                    | None -> None
-                        )
+                    ctx
+                    |> Files.browseFile (Path.Combine(Core.rootDir, "Static")) path
+                    |>  Async.map(
+                                fun o ->
+                                match o with
+                                | Some ctx -> 
+                                    Some {
+                                        ctx with 
+                                            response = {
+                                                ctx.response with 
+                                                    headers = 
+                                                        [
+                                                            "Access-Control-Allow-Origin", "https://epicpenwebsitedev.azurewebsites.net"
+                                                            "Cache-Control", "public, immutable, max-age=31536000"
+                                                        ]
+                                                        |> List.append ctx.response.headers
+                                            }
+                                    }
+                                | None -> None
+                    )
                     //try
                     //with
                     //| e ->
