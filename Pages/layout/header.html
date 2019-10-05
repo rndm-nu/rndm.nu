@@ -32,24 +32,29 @@
         }
 
 
-        .span-col-3 {
-            grid-column: span 3 / auto;
-        }
 
-        .span-col-2 {
-            grid-column: span 2 / auto;
-        }
-
-        .span-row-3 {
-            grid-row: span 3 / auto;
+        
+        .grid {
+            display: grid;
+            max-width: 1000px;
+            min-width: 360px;
+            margin: auto;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 10px;
+            grid-template-rows: auto auto auto 1fr;
+            min-height: 100%;
         }
 
         @media screen and (max-width: 600px) {
+            .grid {
+                grid-template-columns: repeat(1, 1fr);
+            }
             .headerDiv {
                 background: black;
                 margin: -20px -40px 20px -40px;
                 padding: 20px 40px;
             }
+
 
             .menuButton {
                 float: right;
@@ -63,12 +68,6 @@
                 color: white;
             }
 
-            .grid {
-                max-width: 1000px;
-                min-width: 360px;
-                margin: auto;
-                min-height: 100%;
-            }
 
             .bigMenuDiv {
                 display: none;
@@ -92,20 +91,19 @@
                 color: black;
             }
 
-            .grid {
-                display: grid;
-                max-width: 1000px;
-                min-width: 360px;
-                margin: auto;
-                grid-template-columns: repeat(3, 1fr);
-                grid-gap: 10px;
-                grid-template-rows: auto auto auto 1fr;
-                min-height: 100%;
-            }
 
             .bigMenuDiv {
                 float: right;
                 margin-top: 22;
+            }
+            
+
+            .span-col-3 {
+                grid-column: span 3 / auto;
+            }
+
+            .span-col-2 {
+                grid-column: span 2 / auto;
             }
         }
 

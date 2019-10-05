@@ -1,233 +1,51 @@
-<html>
-<head>
-    <style type="text/css">
-        @font-face {
-            font-family: 'Oswald';
-            font-style: normal;
-            font-weight: 400;
-            src: url('[@$staticRoot]f/oswald.woff2');
-        }
-
-        body {
-            margin: 10px 40px;
-            font-family: Helvetica, sans-serif;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Oswald', sans-serif;
-            text-transform: uppercase;
-            margin: 0px;
-        }
-
-        h1 {
-            font-size: 4em;
-        }
-
-        h2 {
-            margin-top: 20px;
-        }
-
-        h3 {
-            margin-top: 14px;
-        }
-
-
-        .span-col-3 {
-            grid-column: span 3 / auto;
-        }
-
-        .span-col-2 {
-            grid-column: span 2 / auto;
-        }
-
-        .span-row-3 {
-            grid-row: span 3 / auto;
-        }
-
-        @media screen and (max-width: 600px) {
-            .headerDiv {
-                background: black;
-                margin: -20px -40px 20px -40px;
-                padding: 20px 40px;
-            }
-            .menuButton {
-                float: right;
-                margin-top: 22;
-                background: white;
-                width: 56px;
-                height: 56px;
-            }
-            h1 {
-                color: white;
-            }
-            
-            .grid {
-                max-width: 1000px;
-                min-width: 360px;
-                margin: auto;
-                min-height: 100%;
-            }
-            
-            .bigMenuDiv {
-                display: none;
-            }
-            .largeScreenOnly {
-                display: none;
-            }
-        }
-        @media screen and (min-width: 601px) {
-            .headerDiv {
-                min-height: 160px;
-            }
-            .menuButton {
-                display: none;
-            }
-            h1 {
-                color: black;
-            }
-            .grid {
-                display: grid;
-                max-width: 1000px;
-                min-width: 360px;
-                margin: auto;
-                grid-template-columns: repeat(3, 1fr);
-                grid-gap: 10px;
-                grid-template-rows: auto auto auto 1fr;
-                min-height: 100%;
-            }
-            .bigMenuDiv {
-                float: right;
-                margin-top: 22;
-            }
-
-        }
-
-
-        .code {
-            font-family: monospace;
-        }
-
-        a {
-            color: black;
-        }
-
-        .rerun-button {
-            display: inline;
-            background: white;
-            padding: 3 5px;
-            margin: 5px;
-            font-size: 14px;
-            color: white;
-            cursor: pointer;
-            white-space: nowrap;
-            user-select: none;
-        }
-
-            .rerun-button:hover {
-                background: black;
-            }
-
-        button {
-            font-size: medium;
-            -webkit-border-radius: 0;
-            -moz-border-radius: 0;
-            border-radius: 0px;
-            color: #1b1b1b;
-            background: #ffffff;
-            padding: 10px 20px 10px 20px;
-            border: solid #050505 2px;
-            outline: none;
-            width: 100%
-        }
-
-            button:hover {
-                border: solid #1b1b1b 4px;
-                padding: 8px 18px 8px 18px;
-                color: #1b1b1b;
-            }
-
-            button:active {
-                background: #1b1b1b;
-                color: #ffffff;
-            }
-    </style>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-</head>
-<body>
-
-
-
-
-
-    <div class="grid">
-        <div class="span-col-3 headerDiv">
-            <div class="bigMenuDiv">about&nbsp;&nbsp;&nbsp;api&nbsp;&nbsp;&nbsp;service health&nbsp;&nbsp;&nbsp;qouta&nbsp;&nbsp;&nbsp;account&nbsp;&nbsp;&nbsp;GB</div>
-            <div class="menuButton"></div>
-            <h1>RNDM.NU</h1>
-            <span class="largeScreenOnly">random number web api</span>
-
-        </div>
-
-
-        <div style="
+[@$header()]
+<div style="
 ">A random number between 1 and 6</div>
-        <div><a href="/">rndm.nu/6</a></div>
-        <div>4<div class="rerun-button">re-run</div></div>
-        <div>A random number between 4 and 10</div>
-        <div><a href="/">rndm.nu/4-10</a></div>
-        <div>9<div class="rerun-button">re-run</div></div>
-        <div>3 random nunmbers between 4 and 9</div>
-        <div><a href="/">rndm.nu/4-9x3</a></div>
-        <div>4, 4, 6<div class="rerun-button">re-run</div></div>
-        <div>shuffle 6 numbers</div>
-        <div><a href="/">rndm.nu/shuffle6</a></div>
-        <div>4, 1, 6, 5, 2, 3<div class="rerun-button">re-run</div></div>
-        <div>64 bytes of random bits</div>
-        <div><a href="/">rndm.nu/binary32</a></div>
-        <div class="code">
-            5d6b1c2c08c81ba3<br>
-            f6c9b0aeb0f9bdbb<br>
-            016c4cd893f68118<br>
-            b5e26ba1f7129fad<br>
-            aaa1a2d4ca745218
-            <div class="rerun-button">re-run</div>
-        </div>
+<div><a href="/">rndm.nu/6</a></div>
+<div>4<div class="rerun-button">re-run</div></div>
+<div>A random number between 4 and 10</div>
+<div><a href="/">rndm.nu/4-10</a></div>
+<div>9<div class="rerun-button">re-run</div></div>
+<div>3 random nunmbers between 4 and 9</div>
+<div><a href="/">rndm.nu/4-9x3</a></div>
+<div>4, 4, 6<div class="rerun-button">re-run</div></div>
+<div>shuffle 6 numbers</div>
+<div><a href="/">rndm.nu/shuffle6</a></div>
+<div>4, 1, 6, 5, 2, 3<div class="rerun-button">re-run</div></div>
+<div>64 bytes of random bits</div>
+<div><a href="/">rndm.nu/binary32</a></div>
+<div class="code">
+    5d6b1c2c08c81ba3<br>
+    f6c9b0aeb0f9bdbb<br>
+    016c4cd893f68118<br>
+    b5e26ba1f7129fad<br>
+    aaa1a2d4ca745218
+    <div class="rerun-button">re-run</div>
+</div>
 
 
-        <div class="span-col-3 span-row-1"><h2>FORMAT</h2></div>
-        <div>Get HTML</div>
-        <div><a href="/">rndm.nu/6x3</a></div>
-        <div>1, 6, 5<div class="rerun-button">re-run</div></div>
-        <div>Get plain text</div>
-        <div><a href="/">rndm.nu/6x3.txt</a></div>
-        <div>1, 6, 5<div class="rerun-button">re-run</div></div>
-        <div>Get JSON</div>
-        <div><a href="/">rndm.nu/6x3.json</a></div>
-        <div class="code">[1, 6, 5]<div class="rerun-button">re-run</div></div>
-        <div>Get XML</div>
-        <div><a href="/">rndm.nu/6x3.xml</a></div>
-        <div class="code">
-            &lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;root&gt;<br>
-            &nbsp;&nbsp;&nbsp;&lt;int&gt;1&lt;/int&gt;<br>
-            &nbsp;&nbsp;&nbsp;&lt;int&gt;5&lt;/int&gt;<br>
-            &nbsp;&nbsp;&nbsp;&lt;int&gt;4&lt;/int&gt;<br>
-            &lt;/root&gt;<div class="rerun-button">re-run</div>
-        </div>
-        <div>Get binary</div>
-        <div><a href="/">rndm.nu/20x3.bin</a></div>
-        <div class="code">00000012 [as uint64] 18<br>00000004 [as uint64] 4<br>0000000D [as uint64] 13<div class="rerun-button">re-run</div></div>
-        <div class="span-col-3 span-row-1"><h3>Remarks</h3></div>
-        <div class="span-col-3 span-row-1"><span>You can also specify what format you want by setting the <b>Accept-Content</b> HTTP request header.</span></div>
-        <div class="span-col-3" style="
-    margin: 100px 0px 40px 0px;
-">
-            <span style="float: right; font-family: 'Oswald'">©2019 TANK Studios LTD</span>
-
-        </div>
-    </div>
-
-
-
-
-</body>
-</html>
+<div class="span-col-3 span-row-1"><h2>FORMAT</h2></div>
+<div>Get HTML</div>
+<div><a href="/">rndm.nu/6x3</a></div>
+<div>1, 6, 5<div class="rerun-button">re-run</div></div>
+<div>Get plain text</div>
+<div><a href="/">rndm.nu/6x3.txt</a></div>
+<div>1, 6, 5<div class="rerun-button">re-run</div></div>
+<div>Get JSON</div>
+<div><a href="/">rndm.nu/6x3.json</a></div>
+<div class="code">[1, 6, 5]<div class="rerun-button">re-run</div></div>
+<div>Get XML</div>
+<div><a href="/">rndm.nu/6x3.xml</a></div>
+<div class="code">
+    &lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;root&gt;<br>
+    &nbsp;&nbsp;&nbsp;&lt;int&gt;1&lt;/int&gt;<br>
+    &nbsp;&nbsp;&nbsp;&lt;int&gt;5&lt;/int&gt;<br>
+    &nbsp;&nbsp;&nbsp;&lt;int&gt;4&lt;/int&gt;<br>
+    &lt;/root&gt;<div class="rerun-button">re-run</div>
+</div>
+<div>Get binary</div>
+<div><a href="/">rndm.nu/20x3.bin</a></div>
+<div class="code">00000012 [as uint64] 18<br>00000004 [as uint64] 4<br>0000000D [as uint64] 13<div class="rerun-button">re-run</div></div>
+<div class="span-col-3 span-row-1"><h3>Remarks</h3></div>
+<div class="span-col-3 span-row-1"><span>You can also specify what format you want by setting the <b>Accept-Content</b> HTTP request header.</span></div>
+[@$footer()]
