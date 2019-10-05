@@ -36,16 +36,16 @@ module Controllers =
         |}
 
         
-    let footer1 = fun (funParams : Map<string,string>, req : HttpContext) ->
+    let footer = fun (funParams : Map<string,string>, req : HttpContext) ->
         {|
             fullYear =              System.DateTime.Now.Year |> string
-            paymentScriptType =     if funParams |> Map.containsKey "includePaymentJS" then "text/javascript" else "application/json"
-            gitBranch =             Core.gitBranch
+            //paymentScriptType =     if funParams |> Map.containsKey "includePaymentJS" then "text/javascript" else "application/json"
+            //gitBranch =             Core.gitBranch
             gitCommitHashShort =    Core.gitCommitHashShort
-            gitCommitHash =         Core.gitCommitHash
-            testModeStyle =         if Core.testMode then "" else "display: none;"
-            env =                   Core.env.ToString()
-            nonceKey =              req.userState |> Map.tryFind "nonceKey" |> Option.map string |> Option.defaultValue ""
+            //gitCommitHash =         Core.gitCommitHash
+            //testModeStyle =         if Core.testMode then "" else "display: none;"
+            //env =                   Core.env.ToString()
+            //nonceKey =              req.userState |> Map.tryFind "nonceKey" |> Option.map string |> Option.defaultValue ""
         |}
 
         
