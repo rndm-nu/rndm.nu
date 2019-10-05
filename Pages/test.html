@@ -67,6 +67,13 @@
                 margin: auto;
                 min-height: 100%;
             }
+            
+            .bigMenuDiv {
+                display: none;
+            }
+            .largeScreenOnly {
+                display: none;
+            }
         }
         @media screen and (min-width: 601px) {
             .headerDiv {
@@ -88,6 +95,11 @@
                 grid-template-rows: auto auto auto 1fr;
                 min-height: 100%;
             }
+            .bigMenuDiv {
+                float: right;
+                margin-top: 22;
+            }
+
         }
 
 
@@ -149,10 +161,10 @@
 
     <div class="grid">
         <div class="span-col-3 headerDiv">
-            <div class="menuButton"></div><h1>
-                RNDM.NU
-            </h1>
-
+            <div class="bigMenuDiv">about&nbsp;&nbsp;&nbsp;api&nbsp;&nbsp;&nbsp;service health&nbsp;&nbsp;&nbsp;qouta&nbsp;&nbsp;&nbsp;account&nbsp;&nbsp;&nbsp;GB</div>
+            <div class="menuButton"></div>
+            <h1>RNDM.NU</h1>
+            <span class="largeScreenOnly">random number web api</span>
 
         </div>
 
