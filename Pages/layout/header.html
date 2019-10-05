@@ -2,11 +2,12 @@
 <head>
     <style type="text/css">
         @font-face {
-          font-family: 'Oswald';
-          font-style: normal;
-          font-weight: 400;
-          src: url('[@$staticRoot]f/oswald.woff2');
+            font-family: 'Oswald';
+            font-style: normal;
+            font-weight: 400;
+            src: url('[@$staticRoot]f/oswald.woff2');
         }
+
         body {
             margin: 10px 40px;
             font-family: Helvetica, sans-serif;
@@ -30,20 +31,11 @@
             margin-top: 14px;
         }
 
-        .grid {
-            display: grid;
-            max-width: 1000px;
-            min-width: 500px;
-            margin: auto;
-            grid-template-columns: repeat(3, 1fr);
-            grid-gap: 10px;
-            grid-template-rows: auto auto auto 1fr;
-            min-height: 100%;
-        }
-        
+
         .span-col-3 {
             grid-column: span 3 / auto;
         }
+
         .span-col-2 {
             grid-column: span 2 / auto;
         }
@@ -52,9 +44,71 @@
             grid-row: span 3 / auto;
         }
 
-        .headerDiv {
-            min-height: 160px;
+        @media screen and (max-width: 600px) {
+            .headerDiv {
+                background: black;
+                margin: -20px -40px 20px -40px;
+                padding: 20px 40px;
+            }
+
+            .menuButton {
+                float: right;
+                margin-top: 22;
+                background: white;
+                width: 56px;
+                height: 56px;
+            }
+
+            h1 {
+                color: white;
+            }
+
+            .grid {
+                max-width: 1000px;
+                min-width: 360px;
+                margin: auto;
+                min-height: 100%;
+            }
+
+            .bigMenuDiv {
+                display: none;
+            }
+
+            .largeScreenOnly {
+                display: none;
+            }
         }
+
+        @media screen and (min-width: 601px) {
+            .headerDiv {
+                min-height: 160px;
+            }
+
+            .menuButton {
+                display: none;
+            }
+
+            h1 {
+                color: black;
+            }
+
+            .grid {
+                display: grid;
+                max-width: 1000px;
+                min-width: 360px;
+                margin: auto;
+                grid-template-columns: repeat(3, 1fr);
+                grid-gap: 10px;
+                grid-template-rows: auto auto auto 1fr;
+                min-height: 100%;
+            }
+
+            .bigMenuDiv {
+                float: right;
+                margin-top: 22;
+            }
+        }
+
 
         .code {
             font-family: monospace;
@@ -80,7 +134,7 @@
                 background: black;
             }
 
-            button {
+        button {
             font-size: medium;
             -webkit-border-radius: 0;
             -moz-border-radius: 0;
@@ -92,6 +146,7 @@
             outline: none;
             width: 100%
         }
+
             button:hover {
                 border: solid #1b1b1b 4px;
                 padding: 8px 18px 8px 18px;
@@ -103,6 +158,7 @@
                 color: #ffffff;
             }
     </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 </head>
 <body>
 
@@ -112,10 +168,9 @@
 
     <div class="grid">
         <div class="span-col-3 headerDiv">
-            <div style="
-    float: right;
-    margin-top: 22;
-">about&nbsp;&nbsp;&nbsp;api&nbsp;&nbsp;&nbsp;service health&nbsp;&nbsp;&nbsp;qouta&nbsp;&nbsp;&nbsp;account&nbsp;&nbsp;&nbsp;GB</div><h1>RNDM.NU</h1>
-            <span>random number web api</span>
+            <div class="bigMenuDiv">about&nbsp;&nbsp;&nbsp;api&nbsp;&nbsp;&nbsp;service health&nbsp;&nbsp;&nbsp;qouta&nbsp;&nbsp;&nbsp;account&nbsp;&nbsp;&nbsp;GB</div>
+            <div class="menuButton"></div>
+            <h1>RNDM.NU</h1>
+            <span class="largeScreenOnly">random number web api</span>
 
         </div>
