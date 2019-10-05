@@ -188,7 +188,7 @@ module App =
             
 
         //Process.Start(sprintf "http://localhost:%i" port) |> ignore
-        Process.Start(new ProcessStartInfo("cmd", sprintf "/c start http://localhost:%i/" port)) |> ignore
+        Process.Start(new ProcessStartInfo("cmd", sprintf "/c start http://localhost:%i/api" port)) |> ignore
 
         startWebServer {defaultConfig with bindings = [HttpBinding.create Protocol.HTTP IPAddress.Any port]} helloWorld 
         0 // return an integer exit code
