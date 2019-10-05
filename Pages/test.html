@@ -31,16 +31,6 @@
             margin-top: 14px;
         }
 
-        .grid {
-            display: grid;
-            max-width: 1000px;
-            min-width: 500px;
-            margin: auto;
-            grid-template-columns: repeat(3, 1fr);
-            grid-gap: 10px;
-            grid-template-rows: auto auto auto 1fr;
-            min-height: 100%;
-        }
 
         .span-col-3 {
             grid-column: span 3 / auto;
@@ -54,9 +44,52 @@
             grid-row: span 3 / auto;
         }
 
-        .headerDiv {
-            min-height: 160px;
+        @media screen and (max-width: 600px) {
+            .headerDiv {
+                background: black;
+                margin: -20px -40px 20px -40px;
+                padding: 20px 40px;
+            }
+            .menuButton {
+                float: right;
+                margin-top: 22;
+                background: white;
+                width: 56px;
+                height: 56px;
+            }
+            h1 {
+                color: white;
+            }
+            
+            .grid {
+                max-width: 1000px;
+                min-width: 360px;
+                margin: auto;
+                min-height: 100%;
+            }
         }
+        @media screen and (min-width: 601px) {
+            .headerDiv {
+                min-height: 160px;
+            }
+            .menuButton {
+                display: none;
+            }
+            h1 {
+                color: black;
+            }
+            .grid {
+                display: grid;
+                max-width: 1000px;
+                min-width: 360px;
+                margin: auto;
+                grid-template-columns: repeat(3, 1fr);
+                grid-gap: 10px;
+                grid-template-rows: auto auto auto 1fr;
+                min-height: 100%;
+            }
+        }
+
 
         .code {
             font-family: monospace;
@@ -115,20 +148,8 @@
 
 
     <div class="grid">
-        <div class="span-col-3" style="
-    background: black;
-    margin: -20px -40px 20px -40px;
-    padding: 20px 40px;
-">
-            <div style="
-    float: right;
-    margin-top: 22;
-    background: white;
-    width: 56px;
-    height: 56px;
-"></div><h1 style="
-    color: white;
-">
+        <div class="span-col-3 headerDiv">
+            <div class="menuButton"></div><h1>
                 RNDM.NU
             </h1>
 
