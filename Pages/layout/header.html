@@ -33,7 +33,7 @@
 
 
 
-        
+
         .grid {
             display: grid;
             max-width: 1000px;
@@ -49,6 +49,11 @@
             .grid {
                 grid-template-columns: repeat(1, 1fr);
             }
+
+            .content {
+                font-size: 1.2em;
+            }
+
             .headerDiv {
                 background: black;
                 margin: -20px -40px 20px -40px;
@@ -97,7 +102,7 @@
                 margin-top: 22px;
                 text-align: right;
             }
-            
+
 
             .span-col-3 {
                 grid-column: span 3 / auto;
@@ -109,8 +114,9 @@
         }
 
         .menuLineBreak {
-                display: none;
-            }
+            display: none;
+        }
+
         @media screen and (max-width: 680px) {
             .menuLineBreak {
                 display: block;
@@ -173,12 +179,11 @@
 
 
 
-
     <div class="grid">
-        <div class="span-col-3 headerDiv">
-            <div class="bigMenuDiv">about&nbsp;&nbsp;&nbsp;api&nbsp;&nbsp;&nbsp;service health<br class="menuLineBreak"/>&nbsp;&nbsp;&nbsp;qouta&nbsp;&nbsp;&nbsp;account&nbsp;&nbsp;&nbsp;GB</div>
-            <div class="menuButton"></div>
-            <h1>RNDM.NU</h1>
-            <span class="largeScreenOnly">random number web service</span>
+            <div class="span-col-3 headerDiv">
+                <div class="bigMenuDiv">about&nbsp;&nbsp;&nbsp;api&nbsp;&nbsp;&nbsp;service health<br class="menuLineBreak" />&nbsp;&nbsp;&nbsp;qouta&nbsp;&nbsp;&nbsp;account&nbsp;&nbsp;&nbsp;GB</div>
+                <div class="menuButton"></div>
+                <h1>RNDM.NU</h1>
+                <span class="largeScreenOnly">random number web service</span>
 
-        </div>
+            </div>
