@@ -1,11 +1,17 @@
 ﻿
+//Website and Web API:
+
 rndm.nu							// traffic manager -> nearest main website and web api server
 
 test.rndm.nu					// traffic manager -> nearest main website and web api server (test mode)
 
+s.rndm.nu						// traffic manager -> nearest main website and web api server (static content)
+
 dev.rndm.nu						// traffic manager -> nearest main website and web api dev server
 
 test.dev.rndm.nu				// traffic manager -> nearest main website and web api dev server (test mode)
+
+s.dev.rndm.nu					// traffic manager -> nearest main website and web api dev server (static content)
 
 northeurope.rndm.nu				// specific main website and web api server
 
@@ -16,6 +22,7 @@ dev.northeurope.rndm.nu			// specific main website and web api dev server
 test.dev.northeurope.rndm.nu	// specific main website and web api dev server (test mode)
 
 
+//Entropy devices:
 
 device.rndm.nu					// traffic mager -> nearest device proxy server
 
@@ -23,7 +30,7 @@ dev.device.rndm.nu				// traffic mager -> nearest device proxy dev server
 
 rndm1.device.rndm.nu			// specific device proxy server
 
-rndm1.dev.device.rndm.nu		// specific device proxy dev server
+dev.rndm1.device.rndm.nu		// specific device proxy dev server
 
 
 
