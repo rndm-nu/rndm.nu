@@ -1,0 +1,29 @@
+﻿
+rndm.nu							// traffic manager -> nearest main website and web api server
+
+test.rndm.nu					// traffic manager -> nearest main website and web api server (test mode)
+
+dev.rndm.nu						// traffic manager -> nearest main website and web api dev server
+
+test.dev.rndm.nu				// traffic manager -> nearest main website and web api dev server (test mode)
+
+northeurope.rndm.nu				// specific main website and web api server
+
+test.northeurope.rndm.nu		// specific main website and web api server (test mode)
+
+dev.northeurope.rndm.nu			// specific main website and web api dev server
+
+test.dev.northeurope.rndm.nu	// specific main website and web api dev server (test mode)
+
+
+
+device.rndm.nu					// traffic mager -> nearest device proxy server
+
+dev.device.rndm.nu				// traffic mager -> nearest device proxy dev server
+
+rndm1.device.rndm.nu			// specific device proxy server
+
+rndm1.dev.device.rndm.nu		// specific device proxy dev server
+
+
+

@@ -13,13 +13,12 @@
 <div class="content api-mid-col"><a href="/">rndm.nu/shuffle6</a></div>
 <div class="content largeScreenOnly">4, 1, 6, 5, 2, 3&nbsp;<div class="rerun-button">re-run</div></div>
 <div class="content">64 bytes of random bits</div>
-<div class="content api-mid-col"><a href="/">rndm.nu/binary32</a></div>
+<div class="content api-mid-col"><a href="/">rndm.nu/binary64</a></div>
 <div class="content code largeScreenOnly">
     5d6b1c2c08c81ba3<br>
     f6c9b0aeb0f9bdbb<br>
     016c4cd893f68118<br>
-    b5e26ba1f7129fad<br>
-    aaa1a2d4ca745218
+    b5e26ba1f7129fad
     &nbsp;<div class="rerun-button">re-run</div>
 </div>
 
@@ -48,4 +47,31 @@
 <div class="content code largeScreenOnly">00000012 [as uint64] 18<br>00000004 [as uint64] 4<br>0000000D [as uint64] 13&nbsp;<div class="rerun-button">re-run</div></div>
 <div class="content span-col-3 span-row-1"><h3>Remarks</h3></div>
 <div class="content span-col-3 span-row-1"><span>You can also specify what format you want by setting the <b>Accept-Content</b> HTTP request header.</span></div>
+
+
+<div class="content span-col-3 span-row-1"><h2>PREMIUM</h2></div>
+<div class="content">32 bytes of random bits directly from device</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/binary64.live</a></div>
+<div class="content code largeScreenOnly">
+    <div class="premium-only">premium only</div>
+</div>
+<div class="content">16 bytes of signed random bits directly from device</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/binary64.signed.live</a></div>
+<div class="content code largeScreenOnly">
+    <div class="premium-only">premium only</div>
+</div>
+<div class="content">32 bytes of random bits from specific device</div>
+<div class="content api-mid-col"><a href="/">rndm1.devices.rndm.nu/binary64.live</a></div>
+<div class="content code largeScreenOnly">
+    <div class="premium-only">premium only</div>
+</div>
+<div class="content span-col-3 span-row-1"><h3>Remarks</h3></div>
+<div class="content span-col-3 span-row-1">
+    <p>
+        <span>.live will return a list of random bytes produced directly on the entropy device for each indiviual http request. A traffic manager ensures the closest rndm.nu entropy device to the client is used. The response will contain additional http headers</span>
+    </p>
+    <p>
+        <span>.signed will return a list of random bytes signed by a EV SSL certificate. The signing is performed on the source entropy device itself and ensures the bytes were not tampered with since leaving the device.</span>
+    </p>
+</div>
 [@$footer()]

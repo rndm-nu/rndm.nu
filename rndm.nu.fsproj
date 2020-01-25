@@ -11,10 +11,7 @@
     <DefineConstants>TRACE;ENV_DEVMACHINE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="TypeScript\typings\rx.all.d.ts" />
-    <None Include="TypeScript\typings\stripe.d.ts" />
-    <None Include="TypeScript\typings\jquery.d.ts" />
-    <None Include="TypeScript\payment.ts" />
+    <Content Include="dns-setup.txt" />
     <None Include="run.bat" />
     <None Include="Web.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -41,7 +38,4 @@
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.7.0" />
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="tsc --removeComments --outDir &quot;$(OutDir)Static\tsout&quot; --project &quot;$(ProjectDir)TypeScript&quot;" />
-  </Target>
 </Project>
