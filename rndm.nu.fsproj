@@ -11,6 +11,7 @@
     <DefineConstants>TRACE;ENV_DEVMACHINE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="notes.txt" />
     <Content Include="dns-setup.txt" />
     <None Include="run.bat" />
     <None Include="Web.config">
