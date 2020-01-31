@@ -3,3 +3,7 @@
 https://www.adafruit.com/product/938 "Monochrome 1.3" 128x64 OLED graphic display - STEMMA QT / Qwiic"
 
 https://www.adafruit.com/product/326 "Monochrome 0.96" 128x64 OLED graphic display"
+
+https://uk.farnell.com/omron-d2fs-microswitch "Omron D2FS Ultra Subminiature Anti-Tamper Switch"
+
+https://uk.farnell.com/electrolube/blr15ml/adhesve-anti-tamper-red-15ml/dp/521747?st=Anti-Tamper "BLR15ML -  Anti-Tamper Seal, Bottle, Red, 15 ml"
