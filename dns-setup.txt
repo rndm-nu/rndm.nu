@@ -1,36 +1,40 @@
 ﻿
 //Website and Web API:
 
-rndm.nu							// traffic manager -> nearest main website and web api server
+rndm.nu									// global traffic manager/CDN -> nearest main website and web api server
 
-test.rndm.nu					// traffic manager -> nearest main website and web api server (test mode)
+test.rndm.nu							// global traffic manager/CDN -> nearest main website and web api server (test mode)
 
-s.rndm.nu						// traffic manager -> nearest main website and web api server (static content)
+s.rndm.nu								// global traffic manager/CDN -> nearest main website and web api server (static content)
 
-dev.rndm.nu						// traffic manager -> nearest main website and web api dev server
+dev.rndm.nu								// global traffic manager/CDN -> nearest main website and web api dev server
 
-test.dev.rndm.nu				// traffic manager -> nearest main website and web api dev server (test mode)
+test.dev.rndm.nu						// global traffic manager/CDN -> nearest main website and web api dev server (test mode)
 
-s.dev.rndm.nu					// traffic manager -> nearest main website and web api dev server (static content)
+s.dev.rndm.nu							// global traffic manager/CDN -> nearest main website and web api dev server (static content)
 
-northeurope.rndm.nu				// specific main website and web api server
+northeurope.rndm.nu						// specific main website and web api server
 
-test.northeurope.rndm.nu		// specific main website and web api server (test mode)
+test.northeurope.rndm.nu				// specific main website and web api server (test mode)
 
-dev.northeurope.rndm.nu			// specific main website and web api dev server
+dev.northeurope.rndm.nu					// specific main website and web api dev server
 
-test.dev.northeurope.rndm.nu	// specific main website and web api dev server (test mode)
+test.dev.northeurope.rndm.nu			// specific main website and web api dev server (test mode)
 
 
 //Entropy devices:
 
-device.rndm.nu					// traffic mager -> nearest device proxy server
+device.rndm.nu							// global traffic manager -> nearest device proxy server
 
-dev.device.rndm.nu				// traffic mager -> nearest device proxy dev server
+dev.device.rndm.nu						// global traffic manager -> nearest device proxy dev server
 
-rndm1.device.rndm.nu			// specific device proxy server
+northeurope.device.rndm.nu				// regional traffic manager -> nearest device proxy server
 
-dev.rndm1.device.rndm.nu		// specific device proxy dev server
+dev.northeurope.device.rndm.nu			// regional traffic manager -> nearest device proxy dev server
+
+rdm1.northeurope.device.rndm.nu			// specific device proxy server
+
+dev.rdm1.northeurope.device.rndm.nu		// specific device proxy dev server
 
 
 

@@ -7,3 +7,25 @@ https://www.adafruit.com/product/326 "Monochrome 0.96" 128x64 OLED graphic displ
 https://uk.farnell.com/omron-d2fs-microswitch "Omron D2FS Ultra Subminiature Anti-Tamper Switch"
 
 https://uk.farnell.com/electrolube/blr15ml/adhesve-anti-tamper-red-15ml/dp/521747?st=Anti-Tamper "BLR15ML -  Anti-Tamper Seal, Bottle, Red, 15 ml"
+
+
+// promises:
+
+rndm.nu/promise2021-01-22T17:29:58Z/lottery12-48
+
+--> promise.rndm.nu/5c37e53
+
+12 unuique random numbers chosen from 1 to 48
+
+The numbers will be chosen on 5:29:58pm 22/1/2021 (GMT + 1)
+
+
+-->
+
+12 unuique random numbers chosen from 1 to 48
+
+1, 8, 25, 43, 27, 28, 34, 29
+
+chosen on 5:29:58pm 22/1/2021
+
+signature: AF0DA899B0E649C490B73EE0C7CEE536
