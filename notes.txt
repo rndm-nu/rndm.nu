@@ -1,4 +1,4 @@
-﻿https://www.adafruit.com/product/4351 "Adafruit Infineon Trust M Breakout Board - STEMMA QT / Qwiic"
+https://www.adafruit.com/product/4351 "Adafruit Infineon Trust M Breakout Board - STEMMA QT / Qwiic"
 
 https://www.adafruit.com/product/938 "Monochrome 1.3" 128x64 OLED graphic display - STEMMA QT / Qwiic"
 
@@ -11,7 +11,7 @@ https://uk.farnell.com/electrolube/blr15ml/adhesve-anti-tamper-red-15ml/dp/52174
 
 // promises:
 
-rndm.nu/promise2021-01-22T17:29:58Z/lottery12-48
+rndm.nu/lottery12-48~in12hours
 
 --> promise.rndm.nu/5c37e53
 
@@ -29,3 +29,83 @@ The numbers will be chosen on 5:29:58pm 22/1/2021 (GMT + 1)
 chosen on 5:29:58pm 22/1/2021
 
 signature: AF0DA899B0E649C490B73EE0C7CEE536
+
+
+//compute signature
+[
+	[result id string]
+	[text result string]
+	[timestamp ISO string]
+] |> String.concat "-" |> UTF8Encoder.getBytes |> sign privateKey
+
+
+
+
+
+//promise v2
+
+rndm.nu/unuique12-48~at2021-01-22T17-29-58.0Z			->	rndm.nu/8OTg5MjM4NDd
+
+rndm.nu/unuique12-48~in12hours							->	rndm.nu/8OTg5MjM4NDd
+
+//"-", ".", "_", "~"
+
+//[A-Za-z0-9_-]
+
+//OTg5MjM4NDd //60 bit uint (x10 base 64) + (x1 hex)
+
+//00000000000000000000000000000000-00000000
+
+//[56 bits - id] - [8 bits - shard id]
+
+
+
+rndm.nu/resolve_promise/8OTg5MjM4NDd
+
+
+let request = datebase["8OTg5MjM4NDd_request"]
+let request = {
+	type = 		"unuique"
+	range = 	12-48
+	timeStamp = DateTimeOffset.UTCNow
+	dueTime = 	DateTimeOffset.UTCNow
+}
+
+
+
+datebase["8OTg5MjM4NDd_result"] <- request
+
+
+
+User 
+-> Http request 
+-> F# record request
+-> JSON rand request 
+-> JSON request stored to database 
+-> JSON request read from database 
+-> F# record request
+-> F# record result generated
+-> JSON result generated
+-> Http response generated
+-> User gets response
+
+
+
+-----
+deploy:
+
+
+{
+	RegionsInfo = [
+		{
+			Region = Region.NorthEurope
+			DeviceIds = [1, 2]
+		}
+		{
+			Region = Region.WestUS
+			DeviceIds = [3, 4]
+		}
+	]
+
+
+}

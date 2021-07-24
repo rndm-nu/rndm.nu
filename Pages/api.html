@@ -49,19 +49,26 @@
 <div class="content span-col-3 span-row-1"><span>You can also specify what format you want by setting the <b>Accept-Content</b> HTTP request header.</span></div>
 
 
+<div class="content span-col-3 span-row-1"><h2>PROMISE</h2></div>
+<div class="content">Get a random number in twenty seconds</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/6~in20seconds</a></div>
+<div class="content">Get random numbers in 7 days</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/12x2~in7days</a></div>
+<div class="content">Get random numbers at a specific time and date</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/4-9x3~at2021-01-22T17-29-58.0Z</a></div>
+<div class="content span-col-3 span-row-1"><h3>Remarks</h3></div>
+<div class="content span-col-3 span-row-1"><span>You can also specify what format you want by setting the <b>Accept-Content</b> HTTP request header.</span></div>
+
+
+
 <div class="content span-col-3 span-row-1"><h2>PREMIUM</h2></div>
 <div class="content">32 bytes of random bits directly from device</div>
 <div class="content api-mid-col"><a href="/">rndm.nu/binary64.live</a></div>
 <div class="content code largeScreenOnly">
     <div class="premium-only">premium only</div>
 </div>
-<div class="content">16 bytes of signed random bits directly from device</div>
-<div class="content api-mid-col"><a href="/">rndm.nu/binary64.signed.live</a></div>
-<div class="content code largeScreenOnly">
-    <div class="premium-only">premium only</div>
-</div>
-<div class="content">32 bytes of random bits from specific device</div>
-<div class="content api-mid-col"><a href="/">rndm1.devices.rndm.nu/binary64.live</a></div>
+<div class="content">32 bytes of random bits from specific device type</div>
+<div class="content api-mid-col"><a href="/">IDQ20MC1.devices.rndm.nu/binary64.live</a></div>
 <div class="content code largeScreenOnly">
     <div class="premium-only">premium only</div>
 </div>
@@ -71,7 +78,7 @@
         <span>.live will return a list of random bytes produced directly on the entropy device for each indiviual http request. A traffic manager ensures the closest rndm.nu entropy device to the client is used. The response will contain additional http headers</span>
     </p>
     <p>
-        <span>.signed will return a list of random bytes signed by a EV SSL certificate. The signing is performed on the source entropy device itself and ensures the bytes were not tampered with since leaving the device.</span>
+        <span>Specific devices types are IDQ20MC1 and PQ4000KSI. A traffic manager will ensure the closest entropy device of that type to the client is used. </span>
     </p>
 </div>
 [@$footer()]

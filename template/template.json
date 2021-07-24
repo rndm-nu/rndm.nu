@@ -1,0 +1,469 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "subscriptionId": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "hostingPlanName": {
+            "type": "string"
+        },
+        "serverFarmResourceGroup": {
+            "type": "string"
+        },
+        "alwaysOn": {
+            "type": "bool"
+        },
+        "sku": {
+            "type": "string"
+        },
+        "skuCode": {
+            "type": "string"
+        },
+        "workerSize": {
+            "type": "string"
+        },
+        "workerSizeId": {
+            "type": "string"
+        },
+        "numberOfWorkers": {
+            "type": "string"
+        },
+        "currentStack": {
+            "type": "string"
+        },
+        "phpVersion": {
+            "type": "string"
+        },
+        "netFrameworkVersion": {
+            "type": "string"
+        },
+        "deviceCount": {
+            "type": "int",
+            "defaultValue": 2
+        },
+        "queueReaderInstances": {
+            "type": "int",
+            "defaultValue": 2
+        },
+        "publicWebInstances": {
+            "type": "int",
+            "defaultValue": 2
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-11-01",
+            "name": "[concat('rndmnu-device-vlan-gateway-', resourceGroup().location)]",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/rndmnu-device-vlan-', resourceGroup().location)]",
+                "[concat('Microsoft.Network/publicIPAddresses/rndmnu-device-vlan-pip-', resourceGroup().location)]"
+            ],
+            "tags": {},
+            "properties": {
+                "gatewayType": "Vpn",
+                "ipConfigurations": [
+                    {
+                        "name": "default",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[concat('/subscriptions/4db1ceb4-1079-4e1f-8eec-d372b925588e/resourceGroups/', resourceGroup().name,'/providers/Microsoft.Network/virtualNetworks/rndmnu-device-vlan-', resourceGroup().location, '/subnets/GatewaySubnet')]"
+                            },
+                            "publicIpAddress": {
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIPAddresses', concat('rndmnu-device-vlan-pip-', resourceGroup().location))]"
+                            }
+                        }
+                    }
+                ],
+                "vpnType": "RouteBased",
+                "vpnGatewayGeneration": "Generation2",
+                "sku": {
+                    "name": "VpnGw2",
+                    "tier": "VpnGw2"
+                }
+            }
+        },
+        {
+            "name": "[concat('rndmnu-device-vlan-', resourceGroup().location)]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "dependsOn": [],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "name": "[concat('rndmnu-device-vlan-', resourceGroup().location)]",
+                            "id": "[concat('/subscriptions/4db1ceb4-1079-4e1f-8eec-d372b925588e/resourceGroups/', resourceGroup().name,'/providers/Microsoft.Network/virtualNetworks/rndmnu-device-vlan-', resourceGroup().location)]",
+                            "location": "northeurope",
+                            "type": "Microsoft.Network/virtualNetworks",
+                            "properties": {
+                                "subnets": [
+                                    {
+                                        "name": "default",
+                                        "id": "[concat('/subscriptions/4db1ceb4-1079-4e1f-8eec-d372b925588e/resourceGroups/', resourceGroup().name,'/providers/Microsoft.Network/virtualNetworks/rndmnu-device-vlan-', resourceGroup().location, '/subnets/default')]",
+                                        "properties": {
+                                            "addressPrefix": "10.1.0.0/24"
+                                        }
+                                    },
+                                    {
+                                        "id": "[concat('/subscriptions/4db1ceb4-1079-4e1f-8eec-d372b925588e/resourceGroups/', resourceGroup().name,'/providers/Microsoft.Network/virtualNetworks/rndmnu-device-vlan-', resourceGroup().location, '/subnets/GatewaySubnet')]",
+                                        "name": "GatewaySubnet",
+                                        "properties": {
+                                            "addressPrefix": "10.1.1.0/24"
+                                        }
+                                    }
+                                ],
+                                "addressSpace": {
+                                    "addressPrefixes": [
+                                        "10.1.0.0/16"
+                                    ]
+                                }
+                            },
+                            "tags": {},
+                            "apiVersion": "2019-09-01",
+                            "dependsOn": []
+                        }
+                    ]
+                },
+                "parameters": {}
+            },
+            "resourceGroup": "[resourceGroup().name]"
+        },
+        {
+            "apiVersion": "2019-02-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[concat('rndmnu-device-vlan-pip-', resourceGroup().location)]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+        {
+            "apiVersion": "2018-11-01",
+            "name": "[concat('rndmnu-device-', copyIndex(),'-proxy-', resourceGroup().location)]",
+            "type": "Microsoft.Web/sites",
+            "location": "[parameters('location')]",
+            "tags": null,
+            "dependsOn": [
+                "microsoft.insights/components/rndmnu-device-proxy-insights",
+                "[concat('Microsoft.Web/serverfarms/rndmnu-serviceplan-', resourceGroup().location)]"
+            ],
+            "properties": {
+                "name": "[concat('rndmnu-device-', copyIndex(),'-proxy-', resourceGroup().location)]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference('microsoft.insights/components/rndmnu-device-proxy-insights', '2015-05-01').InstrumentationKey]"
+                        },
+                        {
+                            "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                            "value": "[reference('microsoft.insights/components/rndmnu-device-proxy-insights', '2015-05-01').ConnectionString]"
+                        },
+                        {
+                            "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+                            "value": "~2"
+                        },
+                        {
+                            "name": "XDT_MicrosoftApplicationInsights_Mode",
+                            "value": "default"
+                        }
+                    ],
+                    "metadata": [
+                        {
+                            "name": "CURRENT_STACK",
+                            "value": "[parameters('currentStack')]"
+                        }
+                    ],
+                    "phpVersion": "[parameters('phpVersion')]",
+                    "netFrameworkVersion": "[parameters('netFrameworkVersion')]",
+                    "alwaysOn": "[parameters('alwaysOn')]"
+                },
+                "serverFarmId": "[concat('/subscriptions/', parameters('subscriptionId'),'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/rndmnu-serviceplan-', resourceGroup().location)]",
+                "clientAffinityEnabled": false
+            },
+            "copy": {
+                "name": "device-proxy-copy",
+                "count": "[parameters('deviceCount')]"
+            }
+        },
+        {
+            "apiVersion": "2018-11-01",
+            "name": "[concat('rndmnu-queuerefiller-', resourceGroup().location)]",
+            "type": "Microsoft.Web/sites",
+            "location": "[parameters('location')]",
+            "tags": null,
+            "dependsOn": [
+                "microsoft.insights/components/rndmnu-queuerefiller-insights",
+                "[concat('Microsoft.Web/serverfarms/rndmnu-serviceplan-', resourceGroup().location)]"
+            ],
+            "properties": {
+                "name": "[concat('rndmnu-queuerefiller-', resourceGroup().location)]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference('microsoft.insights/components/rndmnu-queuerefiller-insights', '2015-05-01').InstrumentationKey]"
+                        },
+                        {
+                            "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                            "value": "[reference('microsoft.insights/components/rndmnu-queuerefiller-insights', '2015-05-01').ConnectionString]"
+                        },
+                        {
+                            "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+                            "value": "~2"
+                        },
+                        {
+                            "name": "XDT_MicrosoftApplicationInsights_Mode",
+                            "value": "default"
+                        }
+                    ],
+                    "metadata": [
+                        {
+                            "name": "CURRENT_STACK",
+                            "value": "[parameters('currentStack')]"
+                        }
+                    ],
+                    "phpVersion": "[parameters('phpVersion')]",
+                    "netFrameworkVersion": "[parameters('netFrameworkVersion')]",
+                    "alwaysOn": "[parameters('alwaysOn')]"
+                },
+                "serverFarmId": "[concat('/subscriptions/', parameters('subscriptionId'),'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/rndmnu-serviceplan-', resourceGroup().location)]",
+                "clientAffinityEnabled": false
+            }
+        },
+        {
+            "apiVersion": "2018-11-01",
+            "name": "[concat('rndmnu-queuereader-', resourceGroup().location)]",
+            "type": "Microsoft.Web/sites",
+            "location": "[parameters('location')]",
+            "tags": null,
+            "dependsOn": [
+                "microsoft.insights/components/rndmnu-queuereader-insights",
+                "[concat('Microsoft.Web/serverfarms/rndmnu-serviceplan-', resourceGroup().location)]"
+            ],
+            "properties": {
+                "name": "[concat('rndmnu-queuereader-', resourceGroup().location)]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference('microsoft.insights/components/rndmnu-queuereader-insights', '2015-05-01').InstrumentationKey]"
+                        },
+                        {
+                            "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                            "value": "[reference('microsoft.insights/components/rndmnu-queuereader-insights', '2015-05-01').ConnectionString]"
+                        },
+                        {
+                            "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+                            "value": "~2"
+                        },
+                        {
+                            "name": "XDT_MicrosoftApplicationInsights_Mode",
+                            "value": "default"
+                        }
+                    ],
+                    "metadata": [
+                        {
+                            "name": "CURRENT_STACK",
+                            "value": "[parameters('currentStack')]"
+                        }
+                    ],
+                    "phpVersion": "[parameters('phpVersion')]",
+                    "netFrameworkVersion": "[parameters('netFrameworkVersion')]",
+                    "alwaysOn": "[parameters('alwaysOn')]"
+                },
+                "serverFarmId": "[concat('/subscriptions/', parameters('subscriptionId'),'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/rndmnu-serviceplan-', resourceGroup().location)]",
+                "clientAffinityEnabled": false
+            }
+        },
+        {
+            "apiVersion": "2018-11-01",
+            "name": "[concat('rndmnu-publicweb-', resourceGroup().location)]",
+            "type": "Microsoft.Web/sites",
+            "location": "[parameters('location')]",
+            "tags": null,
+            "dependsOn": [
+                "microsoft.insights/components/rndmnu-publicweb-insights",
+                "[concat('Microsoft.Web/serverfarms/rndmnu-serviceplan-', resourceGroup().location)]"
+            ],
+            "properties": {
+                "name": "[concat('rndmnu-publicweb-', resourceGroup().location)]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference('microsoft.insights/components/rndmnu-publicweb-insights', '2015-05-01').InstrumentationKey]"
+                        },
+                        {
+                            "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                            "value": "[reference('microsoft.insights/components/rndmnu-publicweb-insights', '2015-05-01').ConnectionString]"
+                        },
+                        {
+                            "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+                            "value": "~2"
+                        },
+                        {
+                            "name": "XDT_MicrosoftApplicationInsights_Mode",
+                            "value": "default"
+                        }
+                    ],
+                    "metadata": [
+                        {
+                            "name": "CURRENT_STACK",
+                            "value": "[parameters('currentStack')]"
+                        }
+                    ],
+                    "phpVersion": "[parameters('phpVersion')]",
+                    "netFrameworkVersion": "[parameters('netFrameworkVersion')]",
+                    "alwaysOn": "[parameters('alwaysOn')]"
+                },
+                "serverFarmId": "[concat('/subscriptions/', parameters('subscriptionId'),'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/rndmnu-serviceplan-', resourceGroup().location)]",
+                "clientAffinityEnabled": false
+            }
+        },
+        {
+            "apiVersion": "2018-11-01",
+            "name": "[concat('rndmnu-serviceplan-', resourceGroup().location)]",
+            "type": "Microsoft.Web/serverfarms",
+            "location": "[parameters('location')]",
+            "kind": "",
+            "tags": null,
+            "dependsOn": [],
+            "properties": {
+                "name": "[concat('rndmnu-serviceplan-', resourceGroup().location)]",
+                "workerSize": "[parameters('workerSize')]",
+                "workerSizeId": "[parameters('workerSizeId')]",
+                "numberOfWorkers": "[parameters('numberOfWorkers')]"
+            },
+            "sku": {
+                "Tier": "[parameters('sku')]",
+                "Name": "[parameters('skuCode')]"
+            }
+        },
+        {
+            "apiVersion": "2020-02-02-preview",
+            "name": "rndmnu-device-insights",
+            "type": "microsoft.insights/components",
+            "location": "northeurope",
+            "tags": null,
+            "dependsOn": [
+                "newWorkspaceTemplate"
+            ],
+            "properties": {
+                "ApplicationId": "rndmnu-device-insights",
+                "Request_Source": "IbizaWebAppExtensionCreate",
+                "Flow_Type": "Redfield",
+                "Application_Type": "web",
+                "WorkspaceResourceId": "/subscriptions/4db1ceb4-1079-4e1f-8eec-d372b925588e/resourceGroups/DefaultResourceGroup-NEU/providers/Microsoft.OperationalInsights/workspaces/DefaultWorkspace-4db1ceb4-1079-4e1f-8eec-d372b925588e-NEU"
+            }
+        },
+        {
+            "apiVersion": "2020-02-02-preview",
+            "name": "rndmnu-device-proxy-insights",
+            "type": "microsoft.insights/components",
+            "location": "northeurope",
+            "tags": null,
+            "dependsOn": [
+                "newWorkspaceTemplate"
+            ],
+            "properties": {
+                "ApplicationId": "rndmnu-device-proxy-insights",
+                "Request_Source": "IbizaWebAppExtensionCreate",
+                "Flow_Type": "Redfield",
+                "Application_Type": "web",
+                "WorkspaceResourceId": "/subscriptions/4db1ceb4-1079-4e1f-8eec-d372b925588e/resourceGroups/DefaultResourceGroup-NEU/providers/Microsoft.OperationalInsights/workspaces/DefaultWorkspace-4db1ceb4-1079-4e1f-8eec-d372b925588e-NEU"
+            }
+        },
+        {
+            "apiVersion": "2020-02-02-preview",
+            "name": "rndmnu-queuerefiller-insights",
+            "type": "microsoft.insights/components",
+            "location": "northeurope",
+            "tags": null,
+            "dependsOn": [
+                "newWorkspaceTemplate"
+            ],
+            "properties": {
+                "ApplicationId": "rndmnu-queuerefiller-insights",
+                "Request_Source": "IbizaWebAppExtensionCreate",
+                "Flow_Type": "Redfield",
+                "Application_Type": "web",
+                "WorkspaceResourceId": "/subscriptions/4db1ceb4-1079-4e1f-8eec-d372b925588e/resourceGroups/DefaultResourceGroup-NEU/providers/Microsoft.OperationalInsights/workspaces/DefaultWorkspace-4db1ceb4-1079-4e1f-8eec-d372b925588e-NEU"
+            }
+        },
+        {
+            "apiVersion": "2020-02-02-preview",
+            "name": "rndmnu-queuereader-insights",
+            "type": "microsoft.insights/components",
+            "location": "northeurope",
+            "tags": null,
+            "dependsOn": [
+                "newWorkspaceTemplate"
+            ],
+            "properties": {
+                "ApplicationId": "rndmnu-queuerereader-insights",
+                "Request_Source": "IbizaWebAppExtensionCreate",
+                "Flow_Type": "Redfield",
+                "Application_Type": "web",
+                "WorkspaceResourceId": "/subscriptions/4db1ceb4-1079-4e1f-8eec-d372b925588e/resourceGroups/DefaultResourceGroup-NEU/providers/Microsoft.OperationalInsights/workspaces/DefaultWorkspace-4db1ceb4-1079-4e1f-8eec-d372b925588e-NEU"
+            }
+        },
+        {
+            "apiVersion": "2020-02-02-preview",
+            "name": "rndmnu-publicweb-insights",
+            "type": "microsoft.insights/components",
+            "location": "northeurope",
+            "tags": null,
+            "dependsOn": [
+                "newWorkspaceTemplate"
+            ],
+            "properties": {
+                "ApplicationId": "rndmnu-publicweb-insights",
+                "Request_Source": "IbizaWebAppExtensionCreate",
+                "Flow_Type": "Redfield",
+                "Application_Type": "web",
+                "WorkspaceResourceId": "/subscriptions/4db1ceb4-1079-4e1f-8eec-d372b925588e/resourceGroups/DefaultResourceGroup-NEU/providers/Microsoft.OperationalInsights/workspaces/DefaultWorkspace-4db1ceb4-1079-4e1f-8eec-d372b925588e-NEU"
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "newWorkspaceTemplate",
+            "resourceGroup": "DefaultResourceGroup-NEU",
+            "subscriptionId": "[parameters('subscriptionId')]",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "apiVersion": "2020-08-01",
+                            "name": "DefaultWorkspace-4db1ceb4-1079-4e1f-8eec-d372b925588e-NEU",
+                            "type": "Microsoft.OperationalInsights/workspaces",
+                            "location": "North Europe",
+                            "properties": {}
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

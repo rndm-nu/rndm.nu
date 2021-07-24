@@ -1,0 +1,306 @@
+<html>
+<head>
+    <style type="text/css">
+        @font-face {
+            font-family: 'Oswald';
+            font-style: normal;
+            font-weight: 400;
+            src: url('oswald.woff2');
+        }
+
+        body {
+            margin: 10px 40px;
+            font-family: Helvetica, sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            margin: 0px;
+        }
+
+        h1 {
+            font-size: 4em;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+
+        h3 {
+            margin-top: 14px;
+        }
+
+
+
+
+        .grid {
+            display: grid;
+            max-width: 1000px;
+            margin: auto;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 10px;
+            grid-template-rows: auto auto 1fr;
+            min-height: 100%;
+            min-width: 240px;
+        }
+
+        @media screen and (max-width: 600px) {
+            body {
+                margin: 5px 20px 15px 20px;
+            }
+            .grid {
+                grid-template-columns: repeat(1, 1fr);
+            }
+
+
+            .headerDiv {
+                background: black;
+                margin: -20px -20px 20px -20px;
+                padding: 20px 20px 5px 20px;
+            }
+
+
+            .menuButton {
+                float: right;
+                margin-top: 15px;
+                background: white;
+                width: 40px;
+                height: 40px;
+            }
+
+            h1 {
+                color: white;
+                font-size: 3em;
+                margin-top: -3px;
+            }
+
+
+            .bigMenuDiv {
+                display: none;
+            }
+
+            .largeScreenOnly {
+                display: none;
+            }
+
+            .api-mid-col {
+                margin-bottom: 20px;
+            }
+        }
+
+        @media screen and (min-width: 601px) {
+            body {
+                margin: 5px 20px 20px 20px;
+            }
+            .headerDiv {
+                min-height: 160px;
+            }
+
+            .menuButton {
+                display: none;
+            }
+
+            h1 {
+                color: black;
+            }
+
+
+            .bigMenuDiv {
+                float: right;
+                margin-top: 22px;
+                text-align: right;
+            }
+
+
+            .span-col-3 {
+                grid-column: span 3 / auto;
+            }
+
+            .span-col-2 {
+                grid-column: span 2 / auto;
+            }
+        }
+
+        .menuLineBreak {
+            display: none;
+        }
+
+        @media screen and (max-width: 680px) {
+            .menuLineBreak {
+                display: block;
+            }
+        }
+
+
+        .code {
+            font-family: monospace;
+        }
+        .hide-for-now {
+            display: none;
+        }
+
+        a {
+            color: black;
+        }
+
+        .premium-only {
+            display: inline;
+            background: black;
+            padding: 3px 5px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .rerun-button {
+            display: inline;
+            background: white;
+            padding: 3px 5px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .rerun-button:hover {
+            background: black;
+        }
+
+        button {
+            font-size: medium;
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0px;
+            color: #1b1b1b;
+            background: #ffffff;
+            padding: 10px 20px 10px 20px;
+            border: solid #050505 2px;
+            outline: none;
+            width: 100%
+        }
+
+            button:hover {
+                border: solid #1b1b1b 4px;
+                padding: 8px 18px 8px 18px;
+                color: #1b1b1b;
+            }
+
+            button:active {
+                background: #1b1b1b;
+                color: #ffffff;
+            }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+</head>
+<body>
+
+
+
+
+    <div class="grid">
+            <div class="span-col-3 headerDiv">
+                <div class="bigMenuDiv">about&nbsp;&nbsp;&nbsp;api&nbsp;&nbsp;&nbsp;service health<br class="menuLineBreak" />&nbsp;&nbsp;&nbsp;qouta&nbsp;&nbsp;&nbsp;account&nbsp;&nbsp;&nbsp;GB</div>
+                <div class="menuButton"></div>
+                <h1>RNDM.NU</h1>
+                <span class="largeScreenOnly">random number web service</span>
+
+            </div>
+
+<div class="content span-col-3"><h2>API</h2></div>
+<div class="content">A random number between 1 and 6</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/6</a></div>
+<div class="content largeScreenOnly">4&nbsp;<div class="rerun-button">re-run</div></div>
+<div class="content">A random number between 4 and 10</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/4-10</a></div>
+<div class="content largeScreenOnly">9&nbsp;<div class="rerun-button">re-run</div></div>
+<div class="content">3 random nunmbers between 4 and 9</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/4-9x3</a></div>
+<div class="content largeScreenOnly">4, 4, 6&nbsp;<div class="rerun-button">re-run</div></div>
+<div class="content">shuffle 6 numbers</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/shuffle6</a></div>
+<div class="content largeScreenOnly">4, 1, 6, 5, 2, 3&nbsp;<div class="rerun-button">re-run</div></div>
+<div class="content">64 bytes of random bits</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/binary64</a></div>
+<div class="content code largeScreenOnly">
+    5d6b1c2c08c81ba3<br>
+    f6c9b0aeb0f9bdbb<br>
+    016c4cd893f68118<br>
+    b5e26ba1f7129fad
+    &nbsp;<div class="rerun-button">re-run</div>
+</div>
+
+
+<div class="content span-col-3 span-row-1"><h2>FORMAT</h2></div>
+<div class="content">Get HTML</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/6x3</a></div>
+<div class="content largeScreenOnly">1, 6, 5&nbsp;<div class="rerun-button">re-run</div></div>
+<div class="content">Get plain text</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/6x3.txt</a></div>
+<div class="content largeScreenOnly">1, 6, 5&nbsp;<div class="rerun-button">re-run</div></div>
+<div class="content">Get JSON</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/6x3.json</a></div>
+<div class="content code largeScreenOnly">[1, 6, 5]&nbsp;<div class="rerun-button">re-run</div></div>
+<div class="content">Get XML</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/6x3.xml</a></div>
+<div class="content code largeScreenOnly">
+    &lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;root&gt;<br>
+    &nbsp;&nbsp;&nbsp;&lt;int&gt;1&lt;/int&gt;<br>
+    &nbsp;&nbsp;&nbsp;&lt;int&gt;5&lt;/int&gt;<br>
+    &nbsp;&nbsp;&nbsp;&lt;int&gt;4&lt;/int&gt;<br>
+    &lt;/root&gt;&nbsp;<div class="rerun-button">re-run</div>
+</div>
+<div class="content">Get binary</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/20x3.bin</a></div>
+<div class="content code largeScreenOnly">00000012 [as uint64] 18<br>00000004 [as uint64] 4<br>0000000D [as uint64] 13&nbsp;<div class="rerun-button">re-run</div></div>
+<div class="content span-col-3 span-row-1"><h3>Remarks</h3></div>
+<div class="content span-col-3 span-row-1"><span>You can also specify what format you want by setting the <b>Accept-Content</b> HTTP request header.</span></div>
+
+
+<div class="content span-col-3 span-row-1"><h2>PROMISE</h2></div>
+<div class="content">Get a random number in twenty seconds</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/6~in20seconds</a></div>
+<div class="content largeScreenOnly"><a href="/">rndm.nu/8OTg5MjM4NDd</a>&nbsp;<div class="rerun-button">re-run</div></div>
+<div class="content">Get random numbers in 7 days</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/12x2~in7days</a></div>
+<div class="content largeScreenOnly"><a href="/">rndm.nu/8OTg5MjM4NDd</a>&nbsp;<div class="rerun-button">re-run</div></div>
+<div class="content">Get random numbers at a specific time and date</div>
+<div class="content api-mid-col"><a href="/">rndm.nu/4-9x3~at2021-01-22T17-29-58.0Z</a></div>
+<div class="content largeScreenOnly"><a href="/">rndm.nu/8OTg5MjM4NDd</a>&nbsp;<div class="rerun-button">re-run</div></div>
+<div class="content span-col-3 span-row-1"><h3>Remarks</h3></div>
+<div class="content span-col-3 span-row-1"><span>A promise request will redirect you to a unuique URL that will only reveal the requested numbers after the specified time. Once this specified time has passed, the numbers will always be available from the unuique URL immutably.</span></div>
+
+
+<div class="content span-col-3 span-row-1 hide-for-now"><h2>PREMIUM</h2></div>
+<div class="content hide-for-now">32 bytes of random bits directly from device</div>
+<div class="content api-mid-col hide-for-now"><a href="/">rndm.nu/binary64.live</a></div>
+<div class="content code largeScreenOnly hide-for-now">
+    <div class="premium-only hide-for-now">premium only</div>
+</div>
+<div class="content hide-for-now">32 bytes of random bits from specific device type</div>
+<div class="content api-mid-col hide-for-now"><a href="/">IDQ20MC1.devices.rndm.nu/binary64.live</a></div>
+<div class="content code largeScreenOnly hide-for-now">
+    <div class="premium-only hide-for-now">premium only</div>
+</div>
+<div class="content span-col-3 span-row-1 hide-for-now"><h3>Remarks</h3></div>
+<div class="content span-col-3 span-row-1 hide-for-now">
+    <p>
+        <span>.live will return a list of random bytes produced directly on the entropy device for each indiviual http request. A traffic manager ensures the closest rndm.nu entropy device to the client is used. The response will contain additional http headers</span>
+    </p>
+    <p>
+        <span>Specific devices types are IDQ20MC1 and PQ4000KSI. A traffic manager will ensure the closest entropy device of that type to the client is used. </span>
+    </p>
+</div>
+    <div class="span-col-3" style="
+    margin: 100px 0px 0px 0px;
+">
+        <span style="float: right; font-family: 'Oswald';text-transform: uppercase;"><a style="text-decoration: none;" target="_blank" href="https://github.com/rndm-nu/rndm.nu/commit/[@$gitCommitHash]">[@$gitCommitHashShort]</a>&nbsp;&nbsp;&nbsp;&#183;&nbsp;&nbsp;&nbsp;&copy;[@$fullYear] TANK Studios LTD</span>
+
+    </div>
+
+        </div>
+
+</body></html>
