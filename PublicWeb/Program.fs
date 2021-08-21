@@ -159,7 +159,7 @@ module PublicWeb =
                             | Unique, None -> 
                                 Error "You must provide a multiplier parameter in Unique mode."
                             | Unique, Some m when m > (range.max - range.min + 1) ->
-                                Error "The mutliplier must be lower that the range of unique numbers."
+                                Error "The mutliplier must be lower than the range of unique numbers."
                             | Shuffle, Some _ ->
                                 Error "You cannot provide a multiplier value in suffle mode."
                             | _ ->
