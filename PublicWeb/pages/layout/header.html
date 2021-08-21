@@ -1,0 +1,208 @@
+﻿<html>
+<head>
+    <style type="text/css">
+        @font-face {
+            font-family: 'Oswald';
+            font-style: normal;
+            font-weight: 400;
+            src: url('static/oswald.woff2');
+        }
+
+        body {
+            margin: 10px 40px;
+            font-family: Helvetica, sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            margin: 0px;
+        }
+
+        h1 {
+            font-size: 4em;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+
+        h3 {
+            margin-top: 14px;
+        }
+
+
+
+
+        .grid {
+            display: grid;
+            max-width: 1000px;
+            margin: auto;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 10px;
+            grid-template-rows: auto auto 1fr;
+            min-height: 100%;
+            min-width: 240px;
+        }
+
+        @media screen and (max-width: 600px) {
+            body {
+                margin: 5px 20px 15px 20px;
+            }
+            .grid {
+                grid-template-columns: repeat(1, 1fr);
+            }
+
+
+            .headerDiv {
+                background: black;
+                margin: -20px -20px 20px -20px;
+                padding: 20px 20px 5px 20px;
+            }
+
+
+            .menuButton {
+                float: right;
+                margin-top: 15px;
+                background: white;
+                width: 40px;
+                height: 40px;
+            }
+
+            h1 {
+                color: white;
+                font-size: 3em;
+                margin-top: -3px;
+            }
+
+
+            .bigMenuDiv {
+                display: none;
+            }
+
+            .largeScreenOnly {
+                display: none;
+            }
+
+            .api-mid-col {
+                margin-bottom: 20px;
+            }
+        }
+
+        @media screen and (min-width: 601px) {
+            body {
+                margin: 5px 20px 20px 20px;
+            }
+            .headerDiv {
+                min-height: 160px;
+            }
+
+            .menuButton {
+                display: none;
+            }
+
+            h1 {
+                color: black;
+            }
+
+
+            .bigMenuDiv {
+                float: right;
+                margin-top: 22px;
+                text-align: right;
+            }
+
+
+            .span-col-3 {
+                grid-column: span 3 / auto;
+            }
+
+            .span-col-2 {
+                grid-column: span 2 / auto;
+            }
+        }
+
+        .menuLineBreak {
+            display: none;
+        }
+
+        @media screen and (max-width: 680px) {
+            .menuLineBreak {
+                display: block;
+            }
+        }
+
+
+        .code {
+            font-family: monospace;
+        }
+
+        a {
+            color: black;
+        }
+
+        .premium-only {
+            display: inline;
+            background: black;
+            padding: 3px 5px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .rerun-button {
+            display: inline;
+            background: white;
+            padding: 3px 5px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .rerun-button:hover {
+            background: black;
+        }
+
+        button {
+            font-size: medium;
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0px;
+            color: #1b1b1b;
+            background: #ffffff;
+            padding: 10px 20px 10px 20px;
+            border: solid #050505 2px;
+            outline: none;
+            width: 100%
+        }
+
+            button:hover {
+                border: solid #1b1b1b 4px;
+                padding: 8px 18px 8px 18px;
+                color: #1b1b1b;
+            }
+
+            button:active {
+                background: #1b1b1b;
+                color: #ffffff;
+            }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+</head>
+<body>
+
+
+
+
+    <div class="grid">
+            <div class="span-col-3 headerDiv">
+                <div class="bigMenuDiv">about&nbsp;&nbsp;&nbsp;api&nbsp;&nbsp;&nbsp;service health<br class="menuLineBreak" />&nbsp;&nbsp;&nbsp;qouta&nbsp;&nbsp;&nbsp;account&nbsp;&nbsp;&nbsp;GB</div>
+                <div class="menuButton"></div>
+                <h1>RNDM.NU</h1>
+                <span class="largeScreenOnly">random number web service</span>
+
+            </div>
