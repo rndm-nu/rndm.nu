@@ -156,7 +156,8 @@ module PublicWeb =
                         |> function
                         | Ok (range) ->
                             match mode, multiplier with
-                            | Unique, None -> Error "You must provide a multiplier parameter in Unique mode."
+                            | Unique, None -> 
+                                Error "You must provide a multiplier parameter in Unique mode."
                             | Unique, Some m when m > (range.max - range.min + 1) ->
                                 Error "The mutliplier must be lower that the range of unique numbers."
                             | Shuffle, Some _ ->
