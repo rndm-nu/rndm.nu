@@ -37,16 +37,16 @@ module PublicWeb =
         }
 
         type RequestModeType =
-        | Normal of IntRange * multiplier : int
+        | Normal of IntRange * multiplier : int option
         | Shuffle of IntRange
-        | Unuique of IntRange * multiplier : int
+        | Unique of IntRange * multiplier : int
         | Binary of numOfBytes : int
 
         
         type ModeParseType =
         | Normal 
         | Shuffle 
-        | Unuique 
+        | Unique 
         | Binary
 
         type RandomNumberRequest = {
@@ -108,9 +108,9 @@ module PublicWeb =
                 | [|remainder; multiplier|] ->
                     match Int32.TryParse multiplier with
                     | (true, multiplier) -> ((Some multiplier), remainder) |> Ok
-                    | (false, _) -> Error (sprintf "Could not parse multiplier '%s'" multiplier)
+                    | (false, _) -> Error (sprintf "Could not parse multiplier '%s'." multiplier)
                 | [|remainder|] -> (None, remainder) |> Ok
-                | _ -> Error "Too many 'x' characters in path"
+                | _ -> Error "Too many 'x' characters in path."
 
             
 
@@ -130,14 +130,14 @@ module PublicWeb =
                         match Int32.TryParse max with
                         | (true, max) -> 
                             {min = min; max = max} |> Ok
-                        | (false, _) -> Error (sprintf "Could not parse max '%s'" max)
-                    | (false, _) -> Error (sprintf "Could not parse min '%s'" min)
+                        | (false, _) -> Error (sprintf "Could not parse max '%s'." max)
+                    | (false, _) -> Error (sprintf "Could not parse min '%s'." min)
                 | [|max|] -> 
                     match Int32.TryParse max with
                     | (true, max) -> 
                         {min = 1; max = max} |> Ok
-                    | (false, _) -> Error (sprintf "Could not parse max '%s'" max)
-                | _ -> Error "Could not parse number range"
+                    | (false, _) -> Error (sprintf "Could not parse max '%s'." max)
+                | _ -> Error "Could not parse number range."
 
 
             parseFormat(path) 
@@ -147,7 +147,7 @@ module PublicWeb =
                 parseMultiplier(remainder)
                 |> function
                 | Ok (multiplier, remainder) ->
-                    let multiplier = multiplier |> Option.defaultValue 1
+                    let impliedMultiplier = multiplier |> Option.defaultValue 1
                     parseMode(remainder)
                     |> function
                     | Ok (mode, remainder') ->
@@ -155,16 +155,24 @@ module PublicWeb =
                         parseRange(remainder')
                         |> function
                         | Ok (range) ->
-                            {
-                                format = format
-                                requestType =
-                                    match mode with
-                                    | Normal -> RequestModeType.Normal(range, multiplier)
-                                    | Shuffle -> RequestModeType.Shuffle(range)
-                                    | Unuique -> RequestModeType.Unuique(range, multiplier)
-                                    | Binary -> RequestModeType.Binary(range.max)
-                                promiseBy = None
-                            } |> Ok
+                            match mode, multiplier with
+                            | Unique, None -> Error "You must provide a multiplier parameter in Unique mode."
+                            | Unique, Some m when m > (range.max - range.min + 1) ->
+                                Error "The mutliplier must be lower that the range of unique numbers."
+                            | Shuffle, Some _ ->
+                                Error "You cannot provide a multiplier value in suffle mode."
+                            | _ ->
+                                
+                                {
+                                    format = format
+                                    requestType =
+                                        match mode with
+                                        | Normal -> RequestModeType.Normal(range, multiplier)
+                                        | Shuffle -> RequestModeType.Shuffle(range)
+                                        | Unique -> RequestModeType.Unique(range, multiplier.Value)
+                                        | Binary -> RequestModeType.Binary(range.max)
+                                    promiseBy = None
+                                } |> Ok
                         | Error err -> err |> Error
                     | Error err -> err |> Error
                 | Error err -> err |> Error
@@ -275,7 +283,14 @@ module PublicWeb =
 
                     let! r = context.Response.BodyWriter.WriteAsync(ReadOnlyMemory(bytes)).AsTask() |> Async.AwaitTask
                     ()
-                | None -> ()
+                | None -> 
+                    match RandomNumberRequestParser.tryParseRequest(path, ([] |> Map.ofList)) with
+                    | Ok result -> 
+                        do! context.Response.WriteAsync(Newtonsoft.Json.JsonConvert.SerializeObject(result))
+                    | Error err -> 
+                        do! context.Response.WriteAsync(err)
+
+
             | Ok () -> ()
             ()
         }
