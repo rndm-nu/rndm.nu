@@ -21,6 +21,163 @@ open FSharp.Control.Tasks.ContextSensitive
 open System.Threading
 
 module PublicWeb =
+
+    module RandomNumberRequestParser =
+        
+        type Format =
+        | Html
+        | Json
+        | Xml
+        | Text
+        | Binary
+
+        type IntRange = {
+            min : int
+            max : int
+        }
+
+        type RequestModeType =
+        | Normal of IntRange * multiplier : int
+        | Shuffle of IntRange
+        | Unuique of IntRange * multiplier : int
+        | Binary of numOfBytes : int
+
+        
+        type ModeParseType =
+        | Normal 
+        | Shuffle 
+        | Unuique 
+        | Binary
+
+        type RandomNumberRequest = {
+            format : Format
+            requestType : RequestModeType
+            promiseBy : DateTimeOffset option
+        }
+        
+        let formatFileExtesnions = [|
+            "txt", Format.Text
+            "bin", Format.Binary
+            "html", Format.Html
+            "json", Format.Json
+            "xml", Format.Xml
+        |]
+
+        
+        let formatMimeTypes = [|
+            "text/html", Format.Html
+            "text/plain", Format.Text
+            "application/json", Format.Json
+            "text/xml", Format.Xml
+            "application/xml", Format.Xml
+            "application/octet-stream", Format.Binary
+        |]
+
+        
+        let modeNames =
+            FSharp.Reflection.FSharpType.GetUnionCases(typeof<ModeParseType>)
+            |> Array.map(fun info -> info.Name.ToLowerInvariant(), FSharp.Reflection.FSharpValue.MakeUnion(info, [||]) :?> ModeParseType)
+
+        let tryParseRequest(path : string, header : Map<string,string>) =
+            let parseFormat(path : string) =
+                formatFileExtesnions 
+                |> Array.tryFind (fun (extension, format) ->
+                    path.EndsWith(sprintf ".%s" extension)
+                )
+                |> function
+                | Some (extension, format) ->
+                    ((Some format), (path.Substring(0, path.Length - extension.Length - 1))) |> Ok
+                | None ->
+                    header |> Map.tryFindKey (fun k v -> k.ToLowerInvariant() = "accept")
+                    |> function
+                    | Some acceptKey ->
+                        header
+                        |> Map.tryFind acceptKey
+                        |> function
+                        | Some accepts ->
+                            formatMimeTypes 
+                            |> Array.tryFind (fun (mime, format) -> accepts.ToLowerInvariant().Contains(mime.ToLowerInvariant()))
+                            |> function
+                            | Some (_, format) -> ((Some format), path) |> Ok
+                            | None -> (None, path) |> Ok
+                        | None -> (None, path) |> Ok
+                    | None -> (None, path) |> Ok
+
+            let parseMultiplier(path : string) =
+                match path.Split('x') with
+                | [|remainder; multiplier|] ->
+                    match Int32.TryParse multiplier with
+                    | (true, multiplier) -> ((Some multiplier), remainder) |> Ok
+                    | (false, _) -> Error (sprintf "Could not parse multiplier '%s'" multiplier)
+                | [|remainder|] -> (None, remainder) |> Ok
+                | _ -> Error "Too many 'x' characters in path"
+
+            
+
+            let parseMode(path : string) =
+                modeNames 
+                |> Array.tryFind(fun (modeName, _) -> path.ToLowerInvariant().StartsWith(modeName))
+                |> function
+                | Some (name, mode) -> ((Some mode), (path.Substring(name.Length, path.Length - name.Length))) |> Ok
+                | None -> (None, path) |> Ok
+
+            
+            let parseRange(path : string) =
+                match path.Split('-') with
+                | [|min; max|] ->
+                    match Int32.TryParse min with
+                    | (true, min) -> 
+                        match Int32.TryParse max with
+                        | (true, max) -> 
+                            {min = min; max = max} |> Ok
+                        | (false, _) -> Error (sprintf "Could not parse max '%s'" max)
+                    | (false, _) -> Error (sprintf "Could not parse min '%s'" min)
+                | [|max|] -> 
+                    match Int32.TryParse max with
+                    | (true, max) -> 
+                        {min = 1; max = max} |> Ok
+                    | (false, _) -> Error (sprintf "Could not parse max '%s'" max)
+                | _ -> Error "Could not parse number range"
+
+
+            parseFormat(path) 
+            |> function
+            | Ok (format, remainder) -> 
+                let format = (format |> Option.defaultValue Format.Html)
+                parseMultiplier(remainder)
+                |> function
+                | Ok (multiplier, remainder) ->
+                    let multiplier = multiplier |> Option.defaultValue 1
+                    parseMode(remainder)
+                    |> function
+                    | Ok (mode, remainder') ->
+                        let mode = mode |> Option.defaultValue Normal
+                        parseRange(remainder')
+                        |> function
+                        | Ok (range) ->
+                            {
+                                format = format
+                                requestType =
+                                    match mode with
+                                    | Normal -> RequestModeType.Normal(range, multiplier)
+                                    | Shuffle -> RequestModeType.Shuffle(range)
+                                    | Unuique -> RequestModeType.Unuique(range, multiplier)
+                                    | Binary -> RequestModeType.Binary(range.max)
+                                promiseBy = None
+                            } |> Ok
+                        | Error err -> err |> Error
+                    | Error err -> err |> Error
+                | Error err -> err |> Error
+            | Error err -> err |> Error
+                            
+
+
+
+
+
+
+
+
     let rnd = new Random()
     
     let js = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tsout", "app.js"))
@@ -36,9 +193,9 @@ module PublicWeb =
         [|
             "randMult",             rand :> obj
             "rand",                 (fun (startRand, endRand, seed, requestId) -> rand(startRand, endRand, seed, 1, requestId)) :> obj
-            "timeString",           (fun (requestId : int) -> DateTime.UtcNow.AddHours(1.0).ToString("o").Replace(':','-')) :> obj
+            "timeString",           (fun (requestId : int) -> DateTime.UtcNow.AddHours(1.0).ToString("o").Replace(':','-').Substring(0, 22) + "Z") :> obj
             "import",               (fun (path : string, requestId : int) -> "") :> obj
-            "gitCommitHashShort",   (fun (requestId : int) -> ThisAssembly.Git.Sha) :> obj
+            "gitCommitHashShort",   (fun (requestId : int) -> ThisAssembly.Git.Sha.Substring(0, 7)) :> obj
             "fullYear",             (fun (requestId : int) -> "2021") :> obj
         |]
         |> Map.ofArray
@@ -68,10 +225,36 @@ module PublicWeb =
 
     let requestHandler (queueReaderSimulator : (unit -> Async<byte array>) option) (context : HttpContext) = 
         task {
+            let result =
+                [|
+                    "6"
+                    "4-12"
+                    "4-12x4"
+                    "shuffle7"
+                    "binary128"
+                    "7x4"
+                    "7x4.txt"
+                    "7x4.json"
+                    "7x4.xml"
+                |]
+                |> Array.map (fun path -> RandomNumberRequestParser.tryParseRequest(path, [] |> Map.ofList))
+
+
+
+
+
+
             let path =
                 match context.Request.Path.Value.TrimStart('/') with
                 | "" -> "api.html"
                 | path -> path
+            let nonce =
+                let rnd = Array.zeroCreate<byte> 16
+                Security.Cryptography.RandomNumberGenerator.Fill(rnd.AsSpan())
+                Convert.ToBase64String(rnd)
+            
+            context.Response.Headers.Add("Content-Security-Policy", StringValues(sprintf "script-src 'nonce-%s'" nonce))
+            
             match! htmlTemplateEngine(path, context.Response.WriteAsync) with
             | Error () ->
                 match staticFiles |> Map.tryFind path with
@@ -86,13 +269,11 @@ module PublicWeb =
                         | (true, mime) ->  mime
                         | (false, _) ->     ""
 
-                    context.Response.Headers.Add("e-tag", StringValues(hashString))
-                    context.Response.Headers.Add("cache-control", StringValues([|"public"; "max-age=36000"|]))
-                    context.Response.Headers.Add("content-type", StringValues(mime))
+                    context.Response.Headers.Add("E-Tag", StringValues(hashString))
+                    context.Response.Headers.Add("Cache-Control", StringValues([|"public"; "max-age=36000"|]))
+                    context.Response.Headers.Add("Content-Type", StringValues(mime))
 
-
-                    let m = ReadOnlyMemory(bytes)
-                    let! r = context.Response.BodyWriter.WriteAsync(m).AsTask() |> Async.AwaitTask
+                    let! r = context.Response.BodyWriter.WriteAsync(ReadOnlyMemory(bytes)).AsTask() |> Async.AwaitTask
                     ()
                 | None -> ()
             | Ok () -> ()
