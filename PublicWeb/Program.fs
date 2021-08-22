@@ -19,10 +19,36 @@ open Microsoft.AspNetCore.StaticFiles
 open System.Reflection
 open FSharp.Control.Tasks.ContextSensitive
 open System.Threading
+open Newtonsoft.Json
+open Microsoft.FSharp.Reflection
 
 module PublicWeb =
 
     module RandomNumberRequestParser =
+        type OptionConverter() =
+            inherit JsonConverter()
+        
+            override x.CanConvert(t) = 
+                t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<option<_>>
+        
+            override x.WriteJson(writer, value, serializer) =
+                let value = 
+                    if value = null then null
+                    else 
+                        let _,fields = FSharpValue.GetUnionFields(value, value.GetType())
+                        fields.[0]  
+                serializer.Serialize(writer, value)
+        
+            override x.ReadJson(reader, t, existingValue, serializer) =        
+                let innerType = t.GetGenericArguments().[0]
+                let innerType = 
+                    if innerType.IsValueType then (typedefof<Nullable<_>>).MakeGenericType([|innerType|])
+                    else innerType        
+                let value = serializer.Deserialize(reader, innerType)
+                let cases = FSharpType.GetUnionCases(t)
+                if value = null then FSharpValue.MakeUnion(cases.[0], [||])
+                else FSharpValue.MakeUnion(cases.[1], [|value|])
+
         
         type Format =
         | Html
@@ -41,6 +67,103 @@ module PublicWeb =
         | Shuffle of IntRange
         | Unique of IntRange * multiplier : int
         | Binary of numOfBytes : int
+
+        type RequestModeTypeJsonConverter() =
+            inherit JsonConverter<RequestModeType>() with
+                override _.WriteJson(writer : JsonWriter, value : RequestModeType, serializer : JsonSerializer) =
+                    writer.WriteStartObject()
+                    writer.WritePropertyName("mode")
+                    let caseInfo, _ = FSharp.Reflection.FSharpValue.GetUnionFields(value, typeof<RequestModeType>)
+                    writer.WriteValue(caseInfo.Name.ToLowerInvariant())
+                    writer.WritePropertyName("values")
+                    writer.WriteStartObject()
+                    
+                    let writeRange (range : IntRange) =
+                        writer.WritePropertyName("min")
+                        writer.WriteValue(range.min)
+                        writer.WritePropertyName("max")
+                        writer.WriteValue(range.max)
+                    
+                    let writeMult (mult : int option) =
+                        writer.WritePropertyName("multiplier")
+                        match mult with
+                        | Some m -> writer.WriteValue(m)
+                        | None ->   writer.WriteNull()
+
+                    match value with
+                    | Normal (range, multiplier) ->
+                        writeRange range
+                        writeMult multiplier
+                    | Shuffle (range) ->
+                        writeRange range
+                    | Unique (range, multiplier) ->
+                        writeRange range
+                        writer.WritePropertyName("multiplier")
+                        writer.WriteValue(multiplier)
+                    | Binary (numOfBytes) ->
+                        writer.WritePropertyName("numOfBytes")
+                        writer.WriteValue(numOfBytes)
+                    writer.WriteEndObject()
+                    writer.WriteEndObject()
+
+                override _.ReadJson(reader : JsonReader, typeToConvert : Type, existinValue : RequestModeType, hasExistingValue : bool, serializer : JsonSerializer) : RequestModeType =
+                    //reader.TokenType = JsonToken.StartObject
+                    let item = Newtonsoft.Json.Linq.JObject.Load(reader)
+                    let mode = item.["mode"].ToString()
+                    let unionCase = FSharp.Reflection.FSharpType.GetUnionCases(typeof<RequestModeType>) |> Array.find(fun case -> case.Name.ToLowerInvariant() = mode)
+
+                    let parameters =
+                        let values = item.["values"] :?> Newtonsoft.Json.Linq.JObject
+                        match mode with
+                        | "normal" -> 
+                            [|
+                                {
+                                    min = values.["min"].ToObject<int>()
+                                    max = values.["max"].ToObject<int>()
+                                } :> obj
+                                (
+                                    match values.["multiplier"].ToObject<obj>() with
+                                    | null -> None
+                                    | mult -> Some (mult :?> int64 |> int)
+                                    :> obj
+                                )
+                            |]
+                        | "shuffle" -> 
+                            [|
+                                {
+                                    min = values.["min"].ToObject() |> int
+                                    max = values.["max"].ToObject() |> int
+                                } :> obj
+                            |]
+                        | "unique" -> 
+                            [|
+                                {
+                                    min = values.["min"].ToObject() |> int
+                                    max = values.["max"].ToObject() |> int
+                                } :> obj
+                                values.["multiplier"].ToObject<int>() :> obj
+                            |]
+                        | "binary" -> 
+                            [|
+                                values.["numOfBytes"].ToObject<int>() :> obj
+                            |]
+
+
+
+                    FSharp.Reflection.FSharpValue.MakeUnion(unionCase, parameters) :?> RequestModeType
+                    
+        
+        type FormatJsonConverter() =
+            inherit JsonConverter<Format>() with
+                override _.WriteJson(writer : JsonWriter, value : Format, serializer : JsonSerializer) =
+                    let caseInfo, _ = FSharp.Reflection.FSharpValue.GetUnionFields(value, typeof<Format>)
+                    writer.WriteValue(caseInfo.Name.ToLowerInvariant())
+
+                override _.ReadJson(reader : JsonReader, typeToConvert : Type, existinValue : Format, hasExistingValue : bool, serializer : JsonSerializer) : Format =
+                    let value = reader.Value :?> string
+                    FSharp.Reflection.FSharpType.GetUnionCases(typeof<Format>)
+                    |> Array.find(fun case -> case.Name.ToLowerInvariant() = value)
+                    |> fun case -> FSharp.Reflection.FSharpValue.MakeUnion(case, [||]) :?> Format
 
         
         type ModeParseType =
@@ -178,6 +301,29 @@ module PublicWeb =
                     | Error err -> err |> Error
                 | Error err -> err |> Error
             | Error err -> err |> Error
+            
+        let requestToJsonString(req : RandomNumberRequest) =
+
+            JsonConvert.SerializeObject(
+                req, 
+                [|
+                    new RequestModeTypeJsonConverter() :> JsonConverter
+                    new OptionConverter() :> JsonConverter
+                    new FormatJsonConverter() :> JsonConverter
+                |]
+            )
+
+        
+        let jsonStringToRequest(json : string) =
+
+            JsonConvert.DeserializeObject<RandomNumberRequest>(
+                json, 
+                [|
+                    new RequestModeTypeJsonConverter() :> JsonConverter
+                    new OptionConverter() :> JsonConverter
+                    new FormatJsonConverter() :> JsonConverter
+                |]
+            )
                             
 
 
@@ -287,7 +433,14 @@ module PublicWeb =
                 | None -> 
                     match RandomNumberRequestParser.tryParseRequest(path, ([] |> Map.ofList)) with
                     | Ok result -> 
-                        do! context.Response.WriteAsync(Newtonsoft.Json.JsonConvert.SerializeObject(result))
+                        let json =
+                            let json = RandomNumberRequestParser.requestToJsonString result
+                            let r =  RandomNumberRequestParser.jsonStringToRequest json
+                            
+                            r |> RandomNumberRequestParser.requestToJsonString
+                        
+
+                        do! context.Response.WriteAsync(json)
                     | Error err -> 
                         do! context.Response.WriteAsync(err)
 
