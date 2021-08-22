@@ -74,11 +74,13 @@ module PublicWeb =
 
         type Shard =
         | Shard0 = 0uy
+        | Shard1 = 1uy
+        | Shard2 = 2uy
 
         let createPrimiseId (shardId : Shard) =
             let shardByte = shardId |> byte
 
-            let rnd64 =
+            let id =
                 let bytes = Array.zeroCreate<byte>(8)
                 Security.Cryptography.RandomNumberGenerator.Fill(bytes.AsSpan())
                 BitConverter.ToUInt64(ReadOnlySpan(bytes))
@@ -95,7 +97,7 @@ module PublicWeb =
 
                     uint64toString(num <<< 6, bitsLeft - 6, acu.Append(char))
 
-            uint64toString(rnd64, 64, System.Text.StringBuilder())
+            shardId, (id <<< 6 >>> 6), uint64toString(id, 64, System.Text.StringBuilder())
         
             //do! context.Response.WriteAsync(sprintf "\r\nhttps://rndm.nu/p%s" str)
 
@@ -103,15 +105,26 @@ module PublicWeb =
             
             let rec stringToUint64(str : char array, acu : uint64, bitsLeft : int) =
                 if bitsLeft = 0 then
-                    acu
+                    Ok acu
                 else
-                    let char = str.[0]
-                    let charIndex = base64chars |> Array.findIndex ((=) char) |> byte
-                    let acu = (acu <<< Math.Min(bitsLeft, 6)) + uint64 charIndex
+                    match str |> Array.tryItem 0 with
+                    | Some char ->
+                        match base64chars |> Array.tryFindIndex ((=) char) with
+                        | Some index ->
+                            let charIndex = byte index
+                            let acu = (acu <<< Math.Min(6, bitsLeft)) + (uint64 charIndex >>> (6 - Math.Min(6, bitsLeft)))
 
-                    stringToUint64(str |> Array.skip 1, acu, bitsLeft - Math.Min(bitsLeft, 6))
+                            stringToUint64(str |> Array.skip 1, acu, bitsLeft - Math.Min(bitsLeft, 6))
+                        | None ->
+                            Error "Invalid characters in promise id."
+                    | None ->
+                        Error "Promise id provided in invalid format."
 
-            stringToUint64(idString.ToCharArray(), 0UL, 64)
+            match stringToUint64(idString.ToCharArray(), 0UL, 64) with
+            | Ok id ->
+                let shardId = id >>> (64 - 6) |> byte |> Microsoft.FSharp.Core.LanguagePrimitives.EnumOfValue<byte, Shard>
+                Ok (shardId, (id <<< 6 >>> 6))
+            | Error err -> Error err
 
 
         let tryParsePromise(path : string) =
@@ -123,6 +136,9 @@ module PublicWeb =
 
     let requestHandler (queueReaderSimulator : (unit -> Async<byte array>) option) (context : HttpContext) = 
         task {
+            let stopWatch = new Diagnostics.Stopwatch()
+            stopWatch.Start()
+
             let result =
                 [|
                     "6"
@@ -159,9 +175,8 @@ module PublicWeb =
                 | Some fullPath ->
                     let! bytes = File.ReadAllBytesAsync fullPath
 
-                    let hashString = Convert.ToHexString(System.Security.Cryptography.SHA1.HashData(bytes))
+                    let hashString = bytes |> System.Security.Cryptography.SHA1.HashData |> Convert.ToHexString
 
-                    
                     let mime =
                         match (new FileExtensionContentTypeProvider()).TryGetContentType(path) with
                         | (true, mime) ->  mime
@@ -176,7 +191,12 @@ module PublicWeb =
                 | None -> 
                     match Promise.tryParsePromise(path) with
                     | Some promiseId ->
-                        do! context.Response.WriteAsync(sprintf "https://rndm.nu/p%s" promiseId)
+                        match Promise.tryParsePromiseIdString promiseId with
+                        | Ok (shardId, idInt) ->
+                            do! context.Response.WriteAsync(sprintf "\r\nhttps://rndm.nu/p%s\r\nshard: %s\r\nid: %i" promiseId (shardId.ToString()) idInt)
+                        | Error err -> 
+                            context.Response.StatusCode <- Http.StatusCodes.Status400BadRequest
+                            do! context.Response.WriteAsync(err)
                     | None ->
                         match RequestParsing.tryParseRequest(path, ([] |> Map.ofList)) with
                         | Ok result -> 
@@ -184,12 +204,19 @@ module PublicWeb =
                                 let json = RequestParsing.requestToJsonString result
                                 let r =  RequestParsing.jsonStringToRequest json
                                 r |> RequestParsing.requestToJsonString
-                        
+                            
+                            stopWatch.Stop()
+                            context.Response.Headers.Add("Server-Timing", StringValues(sprintf "total;dur=%f" stopWatch.Elapsed.TotalMilliseconds))
+
                             do! context.Response.WriteAsync(json)
 
-                            let r = Promise.createPrimiseId Promise.Shard.Shard0 |> Promise.tryParsePromiseIdString
-
-                            do! context.Response.WriteAsync(sprintf "\r\nhttps://rndm.nu/p%s" (Promise.createPrimiseId Promise.Shard.Shard0))
+                            let _, _, id = Promise.createPrimiseId Promise.Shard.Shard2 
+                            match Promise.tryParsePromiseIdString id with
+                            | Ok (shardId, idInt) ->
+                                do! context.Response.WriteAsync(sprintf "\r\nhttps://rndm.nu/p%s" id)
+                            | Error err -> 
+                                context.Response.StatusCode <- Http.StatusCodes.Status400BadRequest
+                                do! context.Response.WriteAsync(err)
 
                         | Error err -> 
                             context.Response.StatusCode <- Http.StatusCodes.Status400BadRequest
