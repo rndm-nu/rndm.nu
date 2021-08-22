@@ -69,6 +69,58 @@ module PublicWeb =
         |> Seq.map(fun info -> Path.GetRelativePath(asmDir, info).Replace('\\', '/'), info)
         |> Map.ofSeq
 
+    module Promise =
+        let private base64chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*!".ToCharArray()
+
+        type Shard =
+        | Shard0 = 0uy
+
+        let createPrimiseId (shardId : Shard) =
+            let shardByte = shardId |> byte
+
+            let rnd64 =
+                let bytes = Array.zeroCreate<byte>(8)
+                Security.Cryptography.RandomNumberGenerator.Fill(bytes.AsSpan())
+                BitConverter.ToUInt64(ReadOnlySpan(bytes))
+                |> fun i -> i >>> 6
+                |> fun i -> i + (shardByte |> uint64 <<< (64 - 6))
+
+            let rec uint64toString(num : uint64, bitsLeft : int, acu : System.Text.StringBuilder) =
+                match bitsLeft with
+                | bitsLeft when bitsLeft <= 0 -> 
+                    acu.ToString()
+                | bitsLeft ->
+                    let preparedInt = num >>> (64 - 6) |> uint8
+                    let char = base64chars.[int preparedInt]
+
+                    uint64toString(num <<< 6, bitsLeft - 6, acu.Append(char))
+
+            uint64toString(rnd64, 64, System.Text.StringBuilder())
+        
+            //do! context.Response.WriteAsync(sprintf "\r\nhttps://rndm.nu/p%s" str)
+
+        let tryParsePromiseIdString (idString : string) =
+            
+            let rec stringToUint64(str : char array, acu : uint64, bitsLeft : int) =
+                if bitsLeft = 0 then
+                    acu
+                else
+                    let char = str.[0]
+                    let charIndex = base64chars |> Array.findIndex ((=) char) |> byte
+                    let acu = (acu <<< Math.Min(bitsLeft, 6)) + uint64 charIndex
+
+                    stringToUint64(str |> Array.skip 1, acu, bitsLeft - Math.Min(bitsLeft, 6))
+
+            stringToUint64(idString.ToCharArray(), 0UL, 64)
+
+
+        let tryParsePromise(path : string) =
+            if path.StartsWith('p') then
+                Some (path.Substring(1))
+            else
+                None
+        
+
     let requestHandler (queueReaderSimulator : (unit -> Async<byte array>) option) (context : HttpContext) = 
         task {
             let result =
@@ -122,58 +174,26 @@ module PublicWeb =
                     let! r = context.Response.BodyWriter.WriteAsync(ReadOnlyMemory(bytes)).AsTask() |> Async.AwaitTask
                     ()
                 | None -> 
-                    match RequestParsing.tryParseRequest(path, ([] |> Map.ofList)) with
-                    | Ok result -> 
-                        let json =
-                            let json = RequestParsing.requestToJsonString result
-                            let r =  RequestParsing.jsonStringToRequest json
-                            
-                            r |> RequestParsing.requestToJsonString
+                    match Promise.tryParsePromise(path) with
+                    | Some promiseId ->
+                        do! context.Response.WriteAsync(sprintf "https://rndm.nu/p%s" promiseId)
+                    | None ->
+                        match RequestParsing.tryParseRequest(path, ([] |> Map.ofList)) with
+                        | Ok result -> 
+                            let json =
+                                let json = RequestParsing.requestToJsonString result
+                                let r =  RequestParsing.jsonStringToRequest json
+                                r |> RequestParsing.requestToJsonString
                         
+                            do! context.Response.WriteAsync(json)
 
-                        do! context.Response.WriteAsync(json)
+                            let r = Promise.createPrimiseId Promise.Shard.Shard0 |> Promise.tryParsePromiseIdString
 
-                        let base64chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*!".ToCharArray()
+                            do! context.Response.WriteAsync(sprintf "\r\nhttps://rndm.nu/p%s" (Promise.createPrimiseId Promise.Shard.Shard0))
 
-                        
-                        let shardByte = 63uy
-
-                        let rnd64 =
-                            let bytes = Array.zeroCreate<byte>(8)
-                            Security.Cryptography.RandomNumberGenerator.Fill(bytes.AsSpan())
-
-                            let rr = (shardByte |> uint64 <<< (64 - 6))
-
-                            BitConverter.ToUInt64(ReadOnlySpan(bytes))
-                            //1UL
-                            |> fun i -> i >>> 6
-                            |> fun i -> i + (shardByte |> uint64 <<< (64 - 6))
-
-                        let shardByteRecovered = rnd64 >>> (64 - 6) |> byte
-
-                        
-                        let recoveredId = rnd64 <<< 6 >>> 6 
-
-
-                        let rec uint64toString(num : uint64, bitsLeft : int, acu : System.Text.StringBuilder) =
-                            match bitsLeft with
-                            | bitsLeft when bitsLeft <= 0 -> 
-                                acu.ToString()
-                            | bitsLeft ->
-                                let preparedInt = num >>> (64 - 6) |> uint8
-                                let char = base64chars.[int preparedInt]
-
-                                uint64toString(num <<< 6, bitsLeft - 6, acu.Append(char))
-
-                        let str = uint64toString(rnd64, 64, System.Text.StringBuilder())
-                        
-                        do! context.Response.WriteAsync(sprintf "\r\nhttps://rndm.nu/p%s" str)
-                        ()
-
-                    | Error err -> 
-                        context.Response.StatusCode <- Http.StatusCodes.Status400BadRequest
-                        do! context.Response.WriteAsync(err)
-
+                        | Error err -> 
+                            context.Response.StatusCode <- Http.StatusCodes.Status400BadRequest
+                            do! context.Response.WriteAsync(err)
 
             | Ok () -> ()
             ()
