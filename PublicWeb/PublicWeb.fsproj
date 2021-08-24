@@ -7,6 +7,9 @@
   <ItemGroup>
     <Compile Include="RequestParsing.fs" />
     <Compile Include="NumberRequestFulfilment.fs" />
+    <Content Include="static\favicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="static\oswald.woff2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
