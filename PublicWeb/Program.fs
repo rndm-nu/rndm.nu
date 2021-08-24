@@ -21,6 +21,7 @@ open FSharp.Control.Tasks.ContextSensitive
 open System.Threading
 open Newtonsoft.Json
 open Microsoft.FSharp.Reflection
+open FSharp.Control
 
 module PublicWeb =
 
@@ -199,9 +200,9 @@ module PublicWeb =
                             do! context.Response.WriteAsync(err)
                     | None ->
                         match RequestParsing.tryParseRequest(path, ([] |> Map.ofList)) with
-                        | Ok result -> 
+                        | Ok request -> 
                             let json =
-                                let json = RequestParsing.requestToJsonString result
+                                let json = RequestParsing.requestToJsonString request
                                 let r =  RequestParsing.jsonStringToRequest json
                                 r |> RequestParsing.requestToJsonString
                             
@@ -209,6 +210,30 @@ module PublicWeb =
                             context.Response.Headers.Add("Server-Timing", StringValues(sprintf "total;dur=%f" stopWatch.Elapsed.TotalMilliseconds))
 
                             do! context.Response.WriteAsync(json)
+
+                            do! context.Response.WriteAsync("\r\n\r\nfullfilment:\r\n")
+
+                            let fullfilment = NumberRequestFulfilment.fulfillRequest request
+
+                            match fullfilment with
+                            | NumberRequestFulfilment.OneInteger i ->
+                                let! i = i
+                                do! context.Response.WriteAsync(sprintf "OneInteger: %i" i)
+                            | NumberRequestFulfilment.ManyIntegers ints ->
+                                do! context.Response.WriteAsync("ManyIntegers:\r\n")
+                                do! ints |> AsyncSeq.indexed |> AsyncSeq.iterAsync (fun (index1, is) -> async {
+                                    let prepend = if index1 = 0L then "" else ", "
+                                    let str = is |> Array.map string |> String.concat ", "
+                                    do! context.Response.WriteAsync(sprintf "%s%s" prepend str) |> Async.AwaitTask
+                                })
+                            | NumberRequestFulfilment.Binary ints ->
+                                do! context.Response.WriteAsync("Binary:\r\n")
+                                do! ints |> AsyncSeq.iterAsync (fun b -> async {
+                                    do! context.Response.WriteAsync(sprintf "%s\r\n---------\r\n" (Convert.ToHexString(b))) |> Async.AwaitTask
+                                })
+
+                                
+                            do! context.Response.WriteAsync("\r\n")
 
                             let _, _, id = Promise.createPrimiseId Promise.Shard.Shard2 
                             match Promise.tryParsePromiseIdString id with

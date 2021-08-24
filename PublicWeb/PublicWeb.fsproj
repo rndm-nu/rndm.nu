@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Compile Include="RequestParsing.fs" />
+    <Compile Include="NumberRequestFulfilment.fs" />
     <Content Include="static\oswald.woff2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -28,6 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FSharp.Control.AsyncSeq" Version="3.1.0" />
+    <PackageReference Include="FSharp.Control.Reactive" Version="5.0.2" />
     <PackageReference Include="GitInfo" Version="2.1.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
