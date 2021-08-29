@@ -24,6 +24,107 @@ open Microsoft.FSharp.Reflection
 open FSharp.Control
 
 module PublicWeb =
+    module Database =
+        type DataBasePromise = {
+            uid : string
+            pk : string
+            timeStamp : DateTimeOffset
+            promiseOriginIP : string
+            gitSHA : string
+            promise : RequestParsing.RandomNumberRequest
+        }
+
+        
+        type DataBaseFulfillment = {
+            uid : string
+            pk : string
+            timeStamp : DateTimeOffset
+            gitSHA : string
+        }
+
+        type DatabaseEngine(read : ((string * string) -> Result<string option, string> Async), write : ((string * string * string) -> Result<unit, string> Async), readBinary : (string -> Result<Stream option, string> Async ), writeBinary : (string -> Async<Result<Stream, string>>)) =
+            
+            member __.SavePromise(id : string, shardId : string, requestIP : Net.IPAddress , request : RequestParsing.RandomNumberRequest) =
+                {
+                    uid = id
+                    pk = shardId
+                    timeStamp = DateTimeOffset.UtcNow
+                    promiseOriginIP = requestIP.ToString()
+                    gitSHA = ThisAssembly.Git.Sha
+                    promise = request
+                }
+                |> JsonConvert.SerializeObject
+                |> fun json -> write("promise", id, json)
+
+            member __.TryLoadPromise(id : string) =
+                async {
+                    let! result = read ("promise", id)
+                    match result with
+                    | Ok json ->
+                        return Ok (json |> Option.map JsonConvert.DeserializeObject<DataBasePromise> )
+                    | Error err ->
+                        return Error err
+                }
+            
+            member __.SaveFulfillment(id : string, shardId : string, fulfillment : NumberRequestFulfilment.RequestFulfilment) =
+                async {
+                    let! result =
+                        {
+                            uid = id
+                            pk = shardId
+                            timeStamp = DateTimeOffset.UtcNow
+                            gitSHA = ThisAssembly.Git.Sha
+                        }
+                        |> JsonConvert.SerializeObject
+                        |> fun json -> write("fulfilment", id, json)
+                    
+                    match! writeBinary id with
+                    | Ok stream -> 
+                        match fulfillment with
+                        | NumberRequestFulfilment.RequestFulfilment.Binary bytesSeq ->
+                            do! 
+                                bytesSeq 
+                                |> AsyncSeq.iterAsync(fun bytes -> 
+                                    stream.WriteAsync(bytes, 0, bytes.Length) |> Async.AwaitTask
+                                )
+                            stream.Close()
+                            return Ok ()
+                        | NumberRequestFulfilment.RequestFulfilment.ManyIntegers intSeq ->
+                            do! 
+                                intSeq 
+                                |> AsyncSeq.indexed |> AsyncSeq.iterAsync(fun (index, ints) -> async {
+                                    let json = 
+                                        ints |> Seq.map string |> String.concat ", "
+                                        |> fun numStr ->
+                                            sprintf "%s%s" 
+                                                (
+                                                    if index = 0L then
+                                                        "["
+                                                    else 
+                                                        ", "
+                                                )
+                                                numStr
+
+                                    let bytes = Text.UTF8Encoding.UTF8.GetBytes(json)
+                                    do! stream.WriteAsync(bytes, 0, bytes.Length) |> Async.AwaitTask
+                                })
+                            let bytes = Text.UTF8Encoding.UTF8.GetBytes("]")
+                            do! stream.WriteAsync(bytes, 0, bytes.Length) |> Async.AwaitTask
+                            stream.Close()
+                            return Ok ()
+                        | NumberRequestFulfilment.RequestFulfilment.OneInteger num ->
+                            let! n = num
+                            let bytes = Text.UTF8Encoding.UTF8.GetBytes(string n)
+                            do! stream.WriteAsync(bytes, 0, bytes.Length) |> Async.AwaitTask
+                            stream.Close()
+                            return Ok ()
+                    | Error err ->
+                        return (Error err)
+                }
+
+
+
+
 
     let rnd = new Random()
     
@@ -133,9 +234,25 @@ module PublicWeb =
                 Some (path.Substring(1))
             else
                 None
-        
 
-    let requestHandler (queueReaderSimulator : (unit -> Async<byte array>) option) (context : HttpContext) = 
+    
+    let tryParseTestMode (path : string) =
+        if path.StartsWith("testmode/") then
+            Ok (true, path.Substring("testmode/".Length))
+        else
+            Ok (false, path)
+        
+    let requestHandler (queueReaderSimulator : (unit -> Async<byte array>) option, databaseEngine : Database.DatabaseEngine Option) (context : HttpContext) = 
+        
+        let db = 
+            databaseEngine
+            |> Option.defaultValue(Database.DatabaseEngine(
+                (fun _ -> async {return Error "not implemented"}), 
+                (fun (_) -> async {return Error "not implemented"}), 
+                (fun (_) -> async {return Error "not implemented"}), 
+                (fun (_) -> async {return Error "not implemented"})
+            ))
+        
         task {
             let stopWatch = new Diagnostics.Stopwatch()
             stopWatch.Start()
@@ -159,10 +276,7 @@ module PublicWeb =
 
 
 
-            let path =
-                match context.Request.Path.Value.TrimStart('/') with
-                | "" -> "api.html"
-                | path -> path
+            let path = context.Request.Path.Value.TrimStart('/')
             let nonce =
                 let rnd = Array.zeroCreate<byte> 16
                 Security.Cryptography.RandomNumberGenerator.Fill(rnd.AsSpan())
@@ -170,84 +284,103 @@ module PublicWeb =
             
             context.Response.Headers.Add("Content-Security-Policy", StringValues(sprintf "script-src 'nonce-%s'" nonce))
             
-            match! htmlTemplateEngine(path, context.Response.WriteAsync) with
-            | Error () ->
-                match staticFiles |> Map.tryFind (match path with | "favicon.ico" -> "static/favicon.ico" | path -> path) with
-                | Some fullPath ->
-                    let! bytes = File.ReadAllBytesAsync fullPath
+            match tryParseTestMode path with
+            | Ok (testMode, remainder) ->
+                let remainder =
+                    match remainder with
+                    | "" -> "api.html"
+                    | remainder -> remainder
+                match! htmlTemplateEngine(remainder, context.Response.WriteAsync) with
+                | Error () ->
+                    match staticFiles |> Map.tryFind (match remainder with | "favicon.ico" -> "static/favicon.ico" | path -> path) with
+                    | Some fullPath ->
+                        let! bytes = File.ReadAllBytesAsync fullPath
 
-                    let hashString = bytes |> System.Security.Cryptography.SHA1.HashData |> Convert.ToHexString
+                        let hashString = bytes |> System.Security.Cryptography.SHA1.HashData |> Convert.ToHexString
 
-                    let mime =
-                        match (new FileExtensionContentTypeProvider()).TryGetContentType(path) with
-                        | (true, mime) ->  mime
-                        | (false, _) ->     ""
+                        let mime =
+                            match (new FileExtensionContentTypeProvider()).TryGetContentType(remainder) with
+                            | (true, mime) ->  mime
+                            | (false, _) ->     ""
 
-                    context.Response.Headers.Add("E-Tag", StringValues(hashString))
-                    context.Response.Headers.Add("Cache-Control", StringValues([|"public"; "max-age=36000"|]))
-                    context.Response.Headers.Add("Content-Type", StringValues(mime))
+                        context.Response.Headers.Add("E-Tag", StringValues(hashString))
+                        context.Response.Headers.Add("Cache-Control", StringValues([|"public"; "max-age=36000"|]))
+                        context.Response.Headers.Add("Content-Type", StringValues(mime))
 
-                    let! r = context.Response.BodyWriter.WriteAsync(ReadOnlyMemory(bytes)).AsTask() |> Async.AwaitTask
-                    ()
-                | None -> 
-                    match Promise.tryParsePromise(path) with
-                    | Some promiseId ->
-                        match Promise.tryParsePromiseIdString promiseId with
-                        | Ok (shardId, idInt) ->
-                            do! context.Response.WriteAsync(sprintf "\r\nhttps://rndm.nu/p%s\r\nshard: %s\r\nid: %i" promiseId (shardId.ToString()) idInt)
-                        | Error err -> 
-                            context.Response.StatusCode <- Http.StatusCodes.Status400BadRequest
-                            do! context.Response.WriteAsync(err)
-                    | None ->
-                        match RequestParsing.tryParseRequest(path, ([] |> Map.ofList)) with
-                        | Ok request -> 
-                            let json =
-                                let json = RequestParsing.requestToJsonString request
-                                let r =  RequestParsing.jsonStringToRequest json
-                                r |> RequestParsing.requestToJsonString
+                        let! r = context.Response.BodyWriter.WriteAsync(ReadOnlyMemory(bytes)).AsTask() |> Async.AwaitTask
+                        ()
+                    | None -> 
+                        match Promise.tryParsePromise(remainder) with
+                        | Some promiseId ->
+                            match Promise.tryParsePromiseIdString promiseId with
+                            | Ok (shardId, idInt) ->
+                                do! context.Response.WriteAsync(sprintf "\r\nhttps://rndm.nu/p%s\r\nshard: %s\r\nid: %i" promiseId (shardId.ToString()) idInt)
+                            | Error err -> 
+                                context.Response.StatusCode <- Http.StatusCodes.Status400BadRequest
+                                do! context.Response.WriteAsync(err)
+                        | None ->
+                            match RequestParsing.tryParseRequest(remainder, ([] |> Map.ofList)) with
+                            | Ok request -> 
+                                let json =
+                                    let json = RequestParsing.requestToJsonString request
+                                    let r =  RequestParsing.jsonStringToRequest json
+                                    r |> RequestParsing.requestToJsonString
                             
-                            stopWatch.Stop()
-                            context.Response.Headers.Add("Server-Timing", StringValues(sprintf "total;dur=%f" stopWatch.Elapsed.TotalMilliseconds))
+                                stopWatch.Stop()
+                                context.Response.Headers.Add("Server-Timing", StringValues(sprintf "total;dur=%f" stopWatch.Elapsed.TotalMilliseconds))
 
-                            do! context.Response.WriteAsync(json)
+                                do! context.Response.WriteAsync(json)
 
-                            do! context.Response.WriteAsync("\r\n\r\nfullfilment:\r\n")
+                                do! context.Response.WriteAsync("\r\n\r\nfulfilment:\r\n")
 
-                            let fullfilment = NumberRequestFulfilment.fulfillRequest request
+                                let fullfilment = NumberRequestFulfilment.fulfillRequest request
 
-                            match fullfilment with
-                            | NumberRequestFulfilment.OneInteger i ->
-                                let! i = i
-                                do! context.Response.WriteAsync(sprintf "OneInteger: %i" i)
-                            | NumberRequestFulfilment.ManyIntegers ints ->
-                                do! context.Response.WriteAsync("ManyIntegers:\r\n")
-                                do! ints |> AsyncSeq.indexed |> AsyncSeq.iterAsync (fun (index1, is) -> async {
-                                    let prepend = if index1 = 0L then "" else ", "
-                                    let str = is |> Array.map string |> String.concat ", "
-                                    context.Response.WriteAsync(sprintf "%s%s" prepend str) |> ignore
-                                })
-                            | NumberRequestFulfilment.Binary ints ->
-                                do! context.Response.WriteAsync("Binary:\r\n")
-                                do! ints |> AsyncSeq.iterAsync (fun b -> async {
-                                    do! context.Response.WriteAsync(sprintf "%s\r\n---------\r\n" (Convert.ToHexString(b))) |> Async.AwaitTask
-                                })
+                                match fullfilment with
+                                | NumberRequestFulfilment.OneInteger i ->
+                                    let! i = i
+                                    do! context.Response.WriteAsync(sprintf "OneInteger: %i" i)
+                                | NumberRequestFulfilment.ManyIntegers ints ->
+                                    do! context.Response.WriteAsync("ManyIntegers:\r\n")
+                                    do! ints |> AsyncSeq.indexed |> AsyncSeq.iterAsync (fun (index1, is) -> async {
+                                        let prepend = if index1 = 0L then "" else ", "
+                                        let str = is |> Array.map string |> String.concat ", "
+                                        context.Response.WriteAsync(sprintf "%s%s" prepend str) |> ignore
+                                    })
+                                | NumberRequestFulfilment.Binary ints ->
+                                    do! context.Response.WriteAsync("Binary:\r\n")
+                                    do! ints |> AsyncSeq.iterAsync (fun b -> async {
+                                        do! context.Response.WriteAsync(sprintf "%s\r\n---------\r\n" (Convert.ToHexString(b))) |> Async.AwaitTask
+                                    })
 
                                 
-                            do! context.Response.WriteAsync("\r\n")
+                                let fullfilment2 = NumberRequestFulfilment.fulfillRequest request
+                                
+                                let shardId, _, id = Promise.createPrimiseId Promise.Shard.Shard2 
+                                match! db.SavePromise(id, shardId.ToString(), Net.IPAddress.Parse("192.168.1.1"), request) with
+                                | Ok () -> ()
+                                | Error err -> ()
 
-                            let _, _, id = Promise.createPrimiseId Promise.Shard.Shard2 
-                            match Promise.tryParsePromiseIdString id with
-                            | Ok (shardId, idInt) ->
-                                do! context.Response.WriteAsync(sprintf "\r\nhttps://rndm.nu/p%s" id)
+                                
+                                match! db.SaveFulfillment(id, shardId.ToString(), fullfilment2) with
+                                | Ok () -> ()
+                                | Error err -> ()
+
+                                
+                                do! context.Response.WriteAsync("\r\n")
+
+                                match Promise.tryParsePromiseIdString id with
+                                | Ok (shardId, idInt) ->
+                                    do! context.Response.WriteAsync(sprintf "\r\nhttps://rndm.nu/p%s" id)
+                                | Error err -> 
+                                    context.Response.StatusCode <- Http.StatusCodes.Status400BadRequest
+                                    do! context.Response.WriteAsync(err)
+
                             | Error err -> 
                                 context.Response.StatusCode <- Http.StatusCodes.Status400BadRequest
                                 do! context.Response.WriteAsync(err)
 
-                        | Error err -> 
-                            context.Response.StatusCode <- Http.StatusCodes.Status400BadRequest
-                            do! context.Response.WriteAsync(err)
-
-            | Ok () -> ()
+                | Ok () -> ()
+            | Error () -> ()
             ()
         }
 
@@ -257,7 +390,7 @@ module Program =
     
     type MiddleWare(next: RequestDelegate) = 
         member this.Invoke (context: HttpContext) =
-            PublicWeb.requestHandler None context
+            PublicWeb.requestHandler (None, None) context
 
     type Startup() =
     
