@@ -185,6 +185,46 @@ module RequestParsing =
         |> Array.map(fun info -> info.Name.ToLowerInvariant(), FSharp.Reflection.FSharpValue.MakeUnion(info, [||]) :?> ModeParseType)
 
     let tryParseRequest(path : string, header : Map<string,string>) =
+        let parsePromiseTime(path : string) =
+            match path.Split("at") with
+            | [|remainder; timeStamp|] ->
+                match timeStamp.Split('T') with
+                | [|date; time|] -> 
+                    match DateTimeOffset.TryParse(date + "T" + time.Replace('-', ':')) with
+                    | (true, dateTime) ->
+                        Ok (Some dateTime, remainder)
+                    | _ -> Error "Could not parse promise time."
+                | _ -> Error "Could not parse promise time."
+            | _ -> 
+                match path.Split("in") with
+                | [||] -> Ok (None, path)
+                | strings ->
+                    let inTime = strings |> Seq.last
+                    let remainder = strings |> Seq.rev |> Seq.skip 1 |> Seq.rev |> String.concat "in"
+                    [
+                        "seconds",  TimeSpan.FromSeconds
+                        "minutes",  TimeSpan.FromMinutes
+                        "hours",    TimeSpan.FromHours
+                        "days",     TimeSpan.FromDays
+                    ]
+                    |> Seq.tryPick(fun (unit, intToTimeSpan) ->
+                        if inTime.EndsWith(unit) then
+                            let numOf = inTime.Substring(0, inTime.Length - unit.Length)
+                            match Int32.TryParse(numOf) with
+                            | (true, numOfUnit) -> 
+                                let t = (DateTimeOffset.UtcNow + intToTimeSpan(float numOfUnit))
+                                Some (Some t, remainder)
+                            | _ ->
+                                None
+                        else
+                            None
+                    )
+                    |> function
+                    | Some result -> Ok result
+                    | None -> Ok (None, path)
+                
+
+
         let parseFormat(path : string) =
             formatFileExtesnions 
             |> Array.tryFind (fun (extension, format) ->
@@ -250,36 +290,44 @@ module RequestParsing =
         |> function
         | Ok (format, remainder) -> 
             let format = (format |> Option.defaultValue Format.Html)
-            parseMultiplier(remainder)
+
+            parsePromiseTime(remainder)
             |> function
-            | Ok (multiplier, remainder) ->
-                let impliedMultiplier = multiplier |> Option.defaultValue 1
-                parseMode(remainder)
+            | Ok (promiseTime, remainder) ->
+                parseMultiplier(remainder)
                 |> function
-                | Ok (mode, remainder') ->
-                    let mode = mode |> Option.defaultValue Normal
-                    parseRange(remainder')
+                | Ok (multiplier, remainder) ->
+                    let impliedMultiplier = multiplier |> Option.defaultValue 1
+                    parseMode(remainder)
                     |> function
-                    | Ok (range) ->
-                        match mode, multiplier with
-                        | Unique, None -> 
-                            Error "You must provide a multiplier parameter in Unique mode."
-                        | Unique, Some m when m > (range.max - range.min + 1) ->
-                            Error "The mutliplier must be lower than the range of unique numbers."
-                        | Shuffle, Some _ ->
-                            Error "You cannot provide a multiplier value in suffle mode."
-                        | _ ->
-                                
-                            {
-                                format = format
-                                requestType =
-                                    match mode with
-                                    | Normal -> RequestModeType.Normal(range, multiplier)
-                                    | Shuffle -> RequestModeType.Shuffle(range)
-                                    | Unique -> RequestModeType.Unique(range, multiplier.Value)
-                                    | Binary -> RequestModeType.Binary(range.max)
-                                promiseBy = None
-                            } |> Ok
+                    | Ok (mode, remainder') ->
+                        let mode = mode |> Option.defaultValue Normal
+                        parseRange(remainder')
+                        |> function
+                        | Ok (range) ->
+                            match mode, multiplier with
+                            | Unique, None -> 
+                                Error "You must provide a multiplier parameter in Unique mode."
+                            | Unique, Some m when m > (range.max - range.min + 1) ->
+                                Error "The mutliplier must be lower than the range of unique numbers."
+                            | Shuffle, Some _ ->
+                                Error "You cannot provide a multiplier value in suffle mode."
+                            | _ ->
+                                match promiseTime with
+                                | Some time when time < DateTimeOffset.UtcNow ->
+                                    Error "Promise time must be in the future."
+                                | _ ->
+                                    {
+                                        format = format
+                                        requestType =
+                                            match mode with
+                                            | Normal -> RequestModeType.Normal(range, multiplier)
+                                            | Shuffle -> RequestModeType.Shuffle(range)
+                                            | Unique -> RequestModeType.Unique(range, multiplier.Value)
+                                            | Binary -> RequestModeType.Binary(range.max)
+                                        promiseBy = promiseTime
+                                    } |> Ok
+                        | Error err -> err |> Error
                     | Error err -> err |> Error
                 | Error err -> err |> Error
             | Error err -> err |> Error

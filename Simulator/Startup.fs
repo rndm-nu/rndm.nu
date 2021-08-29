@@ -6,7 +6,7 @@ open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
-
+open PublicWeb.PublicWeb.Database
 
 type CustomMemoryStream(closeCallback : CustomMemoryStream -> unit) =
     inherit IO.MemoryStream() with
@@ -14,42 +14,44 @@ type CustomMemoryStream(closeCallback : CustomMemoryStream -> unit) =
             base.Close()
             closeCallback(this)
 type MiddleWare(next: RequestDelegate) = 
+
+    
+    let db =
+        let promiseDict = new System.Collections.Concurrent.ConcurrentDictionary<string, string>()
+        let fulfillmentDict = new System.Collections.Concurrent.ConcurrentDictionary<string, string>()
+        let binaryDict = new System.Collections.Concurrent.ConcurrentDictionary<string, (string * byte[])>()
+
+        DatabaseEngine(
+            (fun (table, id) -> async {
+                match (match table with | Promise -> promiseDict | Fulfilment -> fulfillmentDict).TryGetValue(id) with
+                | (true, content) ->
+                    return Ok(Some content)
+                | _ -> 
+                    return Ok None
+            }), (fun (table, id, content) -> async {
+                (match table with | Promise -> promiseDict | Fulfilment -> fulfillmentDict).TryAdd(id, content) |> ignore
+                return Ok ()
+            }), (fun (id) -> async {
+                 match binaryDict.TryGetValue(id) with
+                 | (true, (mime, content)) ->
+                     return Ok (Some (mime, (new IO.MemoryStream(content)) :> IO.Stream))
+                 | _ -> 
+                     return Ok None
+            }), (fun (id, mime) -> async {
+                 let ms = 
+                    new CustomMemoryStream(fun stream ->
+                        let a,b = promiseDict, fulfillmentDict
+                        let bytes = stream.ToArray()
+                        let txt = Text.UTF8Encoding.UTF8.GetString(bytes)
+                        let r = binaryDict.TryAdd(id, (mime, bytes)) 
+                        ()
+                    )
+                 return Ok (ms :> IO.Stream)
+            })
+        )
+
+
     member this.Invoke (context: HttpContext) =
-        
-                
-
-        let db =
-            let promiseDict = new System.Collections.Concurrent.ConcurrentDictionary<string, string>()
-            let fulfillmentDict = new System.Collections.Concurrent.ConcurrentDictionary<string, string>()
-            let binaryDict = new System.Collections.Concurrent.ConcurrentDictionary<string, byte[]>()
-
-            PublicWeb.PublicWeb.Database.DatabaseEngine(
-                (fun (table, id) -> async {
-                    match (match table with | "promise" -> promiseDict | "fulfilment" -> fulfillmentDict).TryGetValue(id) with
-                    | (true, content) ->
-                        return Ok(Some content)
-                    | _ -> 
-                        return Ok None
-                }), (fun (table, id, content) -> async {
-                    (match table with | "promise" -> promiseDict | "fulfilment" -> fulfillmentDict).TryAdd(id, content) |> ignore
-                    return Ok ()
-                }), (fun (id) -> async {
-                     match binaryDict.TryGetValue(id) with
-                     | (true, content) ->
-                         return Ok (Some ((new IO.MemoryStream(content)) :> IO.Stream))
-                     | _ -> 
-                         return Ok None
-                }), (fun (id) -> async {
-                     let ms = 
-                        new CustomMemoryStream(fun stream ->
-                            let bytes = stream.ToArray()
-                            let txt = Text.UTF8Encoding.UTF8.GetString(bytes)
-                            binaryDict.TryAdd(id, bytes) |> ignore
-                        )
-                     return Ok (ms :> IO.Stream)
-                })
-            )
-
         PublicWeb.PublicWeb.requestHandler (None, Some db) context
 
 type Startup() =
