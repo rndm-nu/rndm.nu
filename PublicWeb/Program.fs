@@ -172,7 +172,7 @@ module PublicWeb =
             
             match! htmlTemplateEngine(path, context.Response.WriteAsync) with
             | Error () ->
-                match staticFiles |> Map.tryFind path with
+                match staticFiles |> Map.tryFind (match path with | "favicon.ico" -> "static/favicon.ico" | path -> path) with
                 | Some fullPath ->
                     let! bytes = File.ReadAllBytesAsync fullPath
 
@@ -224,7 +224,7 @@ module PublicWeb =
                                 do! ints |> AsyncSeq.indexed |> AsyncSeq.iterAsync (fun (index1, is) -> async {
                                     let prepend = if index1 = 0L then "" else ", "
                                     let str = is |> Array.map string |> String.concat ", "
-                                    do! context.Response.WriteAsync(sprintf "%s%s" prepend str) |> Async.AwaitTask
+                                    context.Response.WriteAsync(sprintf "%s%s" prepend str) |> ignore
                                 })
                             | NumberRequestFulfilment.Binary ints ->
                                 do! context.Response.WriteAsync("Binary:\r\n")
