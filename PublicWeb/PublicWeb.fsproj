@@ -29,7 +29,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="tsout\app.js.map" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="NUglify" Version="1.13.12" />
     <PackageReference Include="FSharp.Control.AsyncSeq" Version="3.1.0" />
     <PackageReference Include="FSharp.Control.Reactive" Version="5.0.2" />
